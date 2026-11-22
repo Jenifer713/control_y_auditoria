@@ -1,0 +1,1229 @@
+﻿<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría COBIT 2019 — Grupo 3</title><!-- v2 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<style>
+:root{--primary:#1a5276;--primary-light:#2980b9;--secondary:#27ae60;--accent:#e67e22;--danger:#c0392b;--warning:#f39c12;
+--bg:#f4f6f9;--card:#fff;--border:#dce1e8;--text:#2c3e50;--muted:#66768a;--shadow:0 2px 12px rgba(0,0,0,.08);--r:10px;
+--input:#fafbfc;--thead:#eef2f7;--hh:70px}
+[data-theme="dark"]{--bg:#0f1117;--card:#1a1d2e;--border:#2d3147;--text:#e2e8f0;--muted:#9aa8bb;--shadow:0 2px 12px rgba(0,0,0,.4);
+--primary:#3b82f6;--primary-light:#60a5fa;--secondary:#22c55e;--accent:#f97316;--danger:#ef4444;--warning:#eab308;--input:#232640;--thead:#1e2235}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Roboto,system-ui,sans-serif;line-height:1.5;padding-bottom:84px;min-width:320px}
+button{font-family:inherit}
+/* ---------- header ---------- */
+header.top{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,#1a5276,#2980b9);color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand .logo{font-size:1.7rem}
+.brand h1{font-size:1rem;font-weight:700;line-height:1.25}
+.brand p{font-size:.74rem;opacity:.85}
+.hctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.hbtn{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 10px;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap;list-style:none;display:inline-flex;gap:5px;align-items:center}
+.hbtn:hover{background:rgba(255,255,255,.28)}
+.hbtn::-webkit-details-marker{display:none}
+.btn-ic{display:none;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 10px;font-size:1.1rem;cursor:pointer}
+.save-ind{font-size:.74rem;background:rgba(255,255,255,.14);padding:4px 8px;border-radius:6px;white-space:nowrap}
+.search{position:relative}
+.search input{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 10px;font-size:.8rem;width:210px;outline:none}
+.search input::placeholder{color:rgba(255,255,255,.75)}
+.sres{position:absolute;top:110%;left:0;width:340px;max-height:320px;overflow:auto;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);display:none;z-index:80}
+.sres.show{display:block}
+.sres button{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--border);padding:8px 12px;font-size:.82rem;color:var(--text);cursor:pointer}
+.sres button:hover,.sres button:focus{background:var(--thead)}
+.sres .empty{padding:10px 12px;font-size:.8rem;color:var(--muted)}
+details.menu{position:relative}
+.menu-list{position:absolute;right:0;top:112%;min-width:260px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:90;padding:4px}
+.menu-list button{display:block;width:100%;text-align:left;background:none;border:none;padding:8px 12px;border-radius:6px;font-size:.82rem;color:var(--text);cursor:pointer}
+.menu-list button:hover{background:var(--thead)}
+.menu-list hr{border:none;border-top:1px solid var(--border);margin:4px 0}
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;padding:12px;align-items:start}
+#sidebar{position:sticky;top:calc(var(--hh) + 10px);max-height:calc(100vh - var(--hh) - 100px);overflow-y:auto;background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:8px}
+.sec-btn{display:flex;width:100%;justify-content:space-between;align-items:center;background:var(--thead);border:none;border-radius:7px;padding:7px 10px;font-size:.78rem;font-weight:700;color:var(--primary);cursor:pointer;margin:6px 0 3px;text-align:left}
+.sitem{display:flex;width:100%;align-items:center;gap:8px;background:none;border:none;border-radius:7px;padding:6px 10px;font-size:.82rem;color:var(--text);cursor:pointer;text-align:left}
+.sitem:hover{background:var(--thead)}
+.sitem.active,.ochip.active{background:var(--primary);color:#fff}
+.sitem .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sitem .cnt{font-size:.68rem;opacity:.8}
+.sitem.dom{font-weight:700;border-left:4px solid var(--dc,var(--primary));border-radius:4px 7px 7px 4px;margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;padding:3px 4px 6px 14px}
+.ochip{display:inline-flex;align-items:center;gap:4px;background:var(--thead);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:.7rem;font-weight:600;color:var(--text);cursor:pointer}
+.ochip:hover{border-color:var(--primary-light)}
+.dot{width:9px;height:9px;border-radius:50%;background:#b8c2cf;display:inline-block;flex-shrink:0}
+.dot.started{background:var(--warning)}.dot.done{background:var(--secondary)}
+main{min-width:0}
+.crumb{font-size:.78rem;color:var(--muted);margin-bottom:8px}
+.crumb b{color:var(--primary)}
+.progress{display:flex;align-items:center;gap:12px;background:var(--card);padding:9px 16px;border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:12px;border-left:4px solid var(--secondary);flex-wrap:wrap}
+.progress .lbl{font-size:.8rem;font-weight:600;color:var(--muted);white-space:nowrap}
+.progress .track{flex:1;min-width:120px;height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+.progress .fill{height:100%;width:0;background:linear-gradient(90deg,var(--danger),var(--warning) 50%,var(--secondary));transition:width .4s}
+.progress .pct{font-weight:700;color:var(--primary);min-width:40px;text-align:right}
+.progress .stepn{font-size:.75rem;color:var(--muted)}
+/* ---------- page ---------- */
+.page-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-left:6px solid var(--dc,var(--primary));border-radius:var(--r);padding:14px 18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.page-head h1{font-size:1.15rem;color:var(--dc,var(--primary))}
+.page-head p{font-size:.84rem;color:var(--muted);margin-top:3px;max-width:760px}
+.ph-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:12px;background:var(--thead);color:var(--muted)}
+.chip.started{background:#fff3cd;color:#856404}.chip.done{background:#d4edda;color:#155724}
+[data-theme="dark"] .chip.started{background:#4a3800;color:#fcd34d}[data-theme="dark"] .chip.done{background:#0d4c1f;color:#6ee7a0}
+.btn{border:none;border-radius:8px;padding:8px 14px;font-size:.84rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.2s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{filter:brightness(1.12)}
+.btn-success{background:var(--secondary);color:#fff}.btn-success:hover{filter:brightness(.92)}
+.btn-ghost{background:var(--card);color:var(--primary);border:1.5px solid var(--primary)}.btn-ghost:hover{background:var(--primary);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{padding:5px 10px;font-size:.76rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 20px;margin-bottom:12px}
+.card h2{font-size:1rem;color:var(--primary);margin-bottom:8px}
+h3.tb-title{font-size:.9rem;color:var(--primary);margin:14px 0 4px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.fg{display:flex;flex-direction:column;gap:3px}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.fg label .rq{color:var(--danger)}
+input,select,textarea{padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:.85rem;background:var(--input);color:var(--text);font-family:inherit;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(41,128,185,.15);background:var(--card)}
+textarea{resize:vertical;min-height:62px}
+.invalid{border-color:var(--danger)!important;background:rgba(192,57,43,.06)}
+.static{padding:7px 10px;background:var(--thead);border-radius:7px;font-size:.85rem}
+.hint{font-size:.74rem;color:var(--muted);min-height:1em}
+.table-wrapper{overflow-x:auto;border:1px solid var(--border);border-radius:8px;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:.8rem;min-width:560px}
+thead{background:var(--thead)}
+th{padding:8px 10px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--primary);border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+td input,td select,td textarea{padding:4px 7px;font-size:.78rem;min-width:90px}
+td textarea{min-height:48px}
+tbody tr:hover{background:var(--thead)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary-light);border-radius:8px;padding:10px 14px}
+.kpi .label{font-size:.68rem;text-transform:uppercase;color:var(--muted);font-weight:700}
+.kpi .value{font-size:1.35rem;font-weight:700;color:var(--primary)}
+.kpi .value.danger{color:var(--danger)}.kpi .value.success{color:var(--secondary)}.kpi .value.warning{color:var(--warning)}
+.kpi .sub{font-size:.68rem;color:var(--muted)}
+.team{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;list-style:none}
+.member{display:flex;align-items:center;gap:9px;background:var(--thead);border-radius:9px;padding:6px 10px}
+.avatar{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.7rem;font-weight:800;flex-shrink:0}
+.ocards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.ocard{background:var(--card);border:1px solid var(--border);border-top:4px solid var(--dc);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px}
+.ocard .cod{font-weight:800;color:var(--dc)}
+.ocard .nm{font-size:.84rem;font-weight:600;flex:1}
+.ocard .meta{font-size:.74rem;color:var(--muted)}
+.mini{height:5px;background:var(--border);border-radius:3px;overflow:hidden}.mini i{display:block;height:100%;background:var(--secondary)}
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.pack{background:var(--card);border:1px solid var(--border);border-top:4px solid var(--dc,var(--primary));border-radius:var(--r);padding:12px 14px}
+.pack h4{font-size:.9rem;color:var(--dc,var(--primary))}
+.pack small{color:var(--muted);font-size:.74rem}
+.pack .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:700}
+.b-cumple{background:#d4edda;color:#155724}.b-parcial{background:#fff3cd;color:#856404}.b-nocumple{background:#f8d7da;color:#721c24}
+.pend a,.pend button{margin:2px}
+/* ---------- bottom bar ---------- */
+#bottomBar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--card);border-top:1px solid var(--border);box-shadow:0 -4px 16px rgba(0,0,0,.1);padding:8px 14px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+#bottomBar .mid{font-size:.76rem;color:var(--muted);text-align:center;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bottomBar .btn span.tt{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ---------- toasts / modal ---------- */
+#toasts{position:fixed;right:16px;bottom:78px;z-index:9500;display:flex;flex-direction:column;gap:8px;max-width:340px}
+.toast{background:var(--primary);color:#fff;padding:10px 16px;border-radius:9px;font-size:.83rem;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:0;transform:translateX(30px);transition:.3s}
+.toast.show{opacity:1;transform:none}.toast.success{background:var(--secondary)}.toast.error{background:var(--danger)}.toast.warning{background:var(--warning);color:#1a1a1a}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9400;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--card);color:var(--text);border-radius:var(--r);padding:20px;max-width:420px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.modal p{margin-bottom:16px;font-size:.9rem}.modal .row{display:flex;gap:8px;justify-content:flex-end}
+/* ---------- tour ---------- */
+#tourLayer{position:fixed;inset:0;z-index:9000}
+#tourSpot{position:fixed;border-radius:10px;box-shadow:0 0 0 9999px rgba(10,12,20,.72),0 0 0 3px var(--warning);transition:all .3s;pointer-events:none}
+#tourCard{position:fixed;z-index:9100;width:min(340px,calc(100vw - 24px));background:var(--card);color:var(--text);border-top:4px solid var(--warning);border-radius:var(--r);box-shadow:0 12px 40px rgba(0,0,0,.45);padding:16px 18px}
+#tourCard h3{font-size:.98rem;color:var(--primary);margin-bottom:6px;display:flex;gap:8px;align-items:center}
+#tourCard h3 b{background:var(--warning);color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:.76rem}
+#tourCard p{font-size:.84rem;color:var(--muted);margin-bottom:12px}
+#tourCard .dots{display:flex;gap:5px;margin-bottom:12px}
+#tourCard .dots i{width:8px;height:8px;border-radius:50%;background:var(--border)}#tourCard .dots i.on{background:var(--warning);width:20px;border-radius:4px}
+#tourCard .acts{display:flex;justify-content:space-between;gap:8px}
+/* ---------- responsive ---------- */
+@media(max-width:960px){
+ .layout{grid-template-columns:1fr;padding:8px}
+ .btn-ic{display:inline-block}
+ #sidebar{position:fixed;left:0;top:0;bottom:0;width:min(320px,88vw);max-height:none;z-index:70;border-radius:0;transform:translateX(-105%);transition:transform .25s;padding-top:12px}
+ body.side-open #sidebar{transform:none}
+ body.side-open::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:65}
+ .search input{width:150px}.sres{width:min(340px,90vw)}
+ #bottomBar .btn span.tt{display:none}
+}
+/* ---------- print ---------- */
+#printRoot{display:none}
+@media print{
+ @page{size:A4;margin:12mm}
+ body>*:not(#printRoot){display:none!important}
+ body{background:#fff!important;padding:0!important}
+ #printRoot{display:block!important;color:#000;background:#fff;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .pcover{break-after:page;text-align:center;padding-top:30mm}
+ .pcover h1{font-size:22pt;color:#1a5276;margin-bottom:8mm}
+ .pcover .mode{display:inline-block;border:2px solid #1a5276;color:#1a5276;padding:3px 14px;border-radius:14px;font-weight:700;margin:4mm 0}
+ .pcover p{font-size:11pt;margin:2mm 0}
+ .pcover ul{list-style:none;margin-top:8mm;font-size:10.5pt;columns:2}
+ .pf{break-before:page}
+ .pcover+.pf{break-before:auto}
+ .pf h2{font-size:14pt;color:#1a5276;border-bottom:2px solid #1a5276;padding-bottom:2mm;margin-bottom:3mm}
+ .pf h3{font-size:11pt;margin:5mm 0 2mm}
+ .pf .pi{font-size:9.5pt;color:#444;margin-bottom:3mm;font-style:italic}
+ .pt{width:100%;min-width:0;border-collapse:collapse;font-size:9.5pt;margin-bottom:3mm}
+ .pt th,.pt td{border:1px solid #777;padding:4px 6px;vertical-align:top;text-align:left;color:#000;text-transform:none;letter-spacing:0;white-space:normal}
+ .pt.kv th{width:28%;background:#e9eef3}
+ .pt.grid th{background:#d6e0ea}
+ .pt td.tall{height:22mm}
+ .pt tr{break-inside:avoid}.pt thead{display:table-header-group}
+}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <button class="btn-ic" id="btnSide" data-do="side" aria-label="Menu">☰</button>
+  <div class="brand"><span class="logo">📋</span><div><h1 data-i18n="app_title"></h1><p data-i18n="app_sub"></p></div></div>
+  <div class="hctl">
+    <div class="search" id="searchBox"><input id="q" type="search" autocomplete="off" data-i18n-ph="search_ph"><div class="sres" id="searchRes"></div></div>
+    <span class="save-ind" id="saveInd" aria-live="polite"></span>
+    <button class="hbtn" id="btnDownloads" data-go="descargas">⬇ <span data-i18n="downloads"></span></button>
+    <details class="menu" id="btnPrint"><summary class="hbtn">🖨 <span data-i18n="print_btn"></span></summary>
+      <div class="menu-list">
+        <button data-do="print" data-scope="current" data-filled="1" data-i18n="p_cur"></button>
+        <button data-do="print" data-scope="all" data-filled="1" data-i18n="p_all"></button>
+        <button data-do="print" data-scope="all" data-filled="0" data-i18n="p_all_blank"></button>
+      </div></details>
+    <button class="hbtn" id="btnTour" data-do="tour">🧭 <span data-i18n="guide"></span></button>
+    <button class="hbtn" id="btnLang" data-do="lang"></button>
+    <button class="hbtn" id="btnTheme" data-do="theme"></button>
+    <details class="menu" id="btnMore"><summary class="hbtn">⋯</summary>
+      <div class="menu-list">
+        <button data-do="bk_export" data-i18n="bk_export"></button>
+        <button data-do="bk_import" data-i18n="bk_import"></button>
+        <hr>
+        <button data-do="clear" data-i18n="clear_all"></button>
+      </div></details>
+  </div>
+</header>
+<input type="file" id="fileIn" accept=".json,application/json" hidden>
+
+<div class="layout">
+  <aside id="sidebar" aria-label="Navegación"></aside>
+  <main>
+    <div class="crumb" id="crumb"></div>
+    <div class="progress"><span class="lbl" id="progLbl"></span>
+      <div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progTrack"><div class="fill" id="progFill"></div></div>
+      <span class="pct" id="progPct">0%</span><span class="stepn" id="stepN"></span></div>
+    <div id="page"></div>
+  </main>
+</div>
+
+<div id="bottomBar">
+  <button class="btn btn-ghost" id="btnPrev" data-do="prev">←&nbsp;<span class="tt"></span></button>
+  <div class="mid" id="barMid"></div>
+  <button class="btn btn-success" id="btnSave" data-do="save">💾 <span data-i18n="save"></span></button>
+  <button class="btn btn-primary" id="btnNext" data-do="next"><span class="tt"></span>&nbsp;→</button>
+</div>
+<div id="printRoot"></div>
+<div id="toasts" aria-live="polite"></div>
+<noscript>Esta herramienta requiere JavaScript.</noscript>
+
+<script>
+'use strict';
+/* =====================================================================
+   UTILIDADES
+   ===================================================================== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mem={};
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return mem[k]!==undefined?mem[k]:null}}
+function lsSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){mem[k]=v;return false}}
+function lsDel(k){try{localStorage.removeItem(k)}catch(e){}delete mem[k]}
+let lang=lsGet('cobit_lang')==='en'?'en':'es';
+const L=o=>o==null?'':typeof o==='string'?o:(o[lang]!==undefined?o[lang]:(o.es!==undefined?o.es:''));
+const pad=(n,w=3)=>String(n).padStart(w,'0');
+const todayISO=()=>new Date().toISOString().slice(0,10);
+
+/* =====================================================================
+   TEXTOS DE LA INTERFAZ (ES / EN)
+   ===================================================================== */
+const UI={
+es:{app_title:'Auditoría de Gobierno y Gestión de I&T — COBIT 2019',app_sub:'Papeles de trabajo · 5 dominios · 40 objetivos · Grupo 3',
+search_ph:'Buscar formulario u objetivo…',no_results:'Sin resultados',saved:'Guardado',saving:'Guardando…',saved_at:'Guardado {t}',nosave:'Sin guardado local (use copia .json)',
+downloads:'Descargas',print_btn:'Imprimir',guide:'Guía',p_cur:'Imprimir este formulario',p_all:'Imprimir todo con datos',p_all_blank:'Imprimir todo en blanco',
+bk_export:'Exportar copia de seguridad (.json)',bk_import:'Importar copia de seguridad',clear_all:'Borrar todos los datos',
+menu_btn:'⬇ Excel / 🖨 Imprimir',x_empty:'⬇ Excel en blanco (plantilla)',x_filled:'⬇ Excel con mis datos',p_empty:'🖨 Imprimir en blanco',p_filled:'🖨 Imprimir con mis datos',
+sec_prep:'1 · Preparación',sec_eval:'2 · Evaluación COBIT (40 objetivos)',sec_papers:'3 · Papeles de trabajo',sec_results:'4 · Resultados',sec_close:'5 · Revisión y descargas',
+progress:'Progreso global (portada + 40 objetivos)',step_of:'Formulario {a} de {b}',prev:'Anterior',next:'Siguiente',save:'Guardar',saved_toast:'Datos guardados en este navegador',
+st_empty:'Sin iniciar',st_started:'En curso',st_done:'Completo',req_note:'* Campo obligatorio',validate:'Validar',val_ok:'Todos los campos obligatorios están completos',val_bad:'Faltan campos obligatorios (marcados en rojo)',
+add_row:'Agregar fila',open_form:'Abrir',dom_done:'Completados',dom_avg:'Nivel promedio',dom_prog:'Avance',
+level:'Nivel actual',target:'Nivel meta',gap:'Brecha',result:'Resultado',not_eval:'Sin evaluar',
+k_valued:'Factores valorados',k_exig:'Índice de exigencia',k_exig_l:['Exigencia baja','Exigencia media','Exigencia alta'],k_scope:'Objetivos en alcance',k_of40:'de 40',k_nojust:'En alcance sin justificar',k_prio:'Prioridad alta',
+k_eval:'Objetivos evaluados',k_gapavg:'Brecha promedio',k_gapn:'Con brecha > 0',k_cumple:'Cumple',k_parcial:'Parcial',k_nocumple:'No cumple',k_sineval:'Sin evaluar',k_conf:'% Conformidad',k_find:'Hallazgos registrados',k_act:'Acciones registradas',
+dl_title:'Centro de descargas',dl_intro:'Descargue los formularios en Excel (en blanco como plantilla o con sus datos) o imprímalos. Cada paquete agrupa varios formularios en un solo archivo.',
+dl_packs:'Paquetes agrupados (un archivo, varias hojas)',dl_forms:'Formularios individuales (un archivo por formulario)',dl_all:'Todo el trabajo de auditoría',dl_blank:'En blanco',dl_filled:'Con datos',dl_xlsx:'Excel',dl_print:'Imprimir',dl_backup:'Copia de seguridad',dl_backup_txt:'Guarde sus datos en un archivo .json para moverlos a otro equipo o navegador.',
+dl_n:'{n} formularios',col_form:'Formulario',col_status:'Estado',
+rev_title:'Revisión final',rev_intro:'Verifique que todo esté completo antes de exportar o imprimir. Los pendientes se listan abajo; haga clic para ir al formulario.',rev_pend:'Pendientes obligatorios',rev_ok:'¡No hay campos obligatorios pendientes!',rev_general:'Datos generales',rev_obj:'Resultados por objetivo',
+conf_clear:'¿Eliminar TODOS los datos guardados? Esta acción no se puede deshacer. (Descargue antes una copia .json si la necesita).',conf_ok:'Aceptar',conf_cancel:'Cancelar',cleared:'Datos eliminados',imported:'Copia importada correctamente',import_err:'Archivo no válido',
+storage_warn:'Este navegador bloquea el guardado local. Use «Exportar copia de seguridad» para no perder sus datos.',xl_missing:'No se cargó la librería de Excel (ExcelJS). Verifique su conexión a internet y recargue.',xl_ok:'Descargado',xl_err:'No se pudo generar el Excel:',
+mode_blank:'FORMATO EN BLANCO',mode_filled:'CON DATOS',generated:'Generado',scope_lbl:'Contenido',team:'Equipo de trabajo — Grupo 3',entity:'Entidad auditada',
+tour_skip:'Salir',tour_prev:'Anterior',tour_next:'Siguiente',tour_done:'Finalizar',
+tour:[
+{t:'¡Bienvenido!',d:'Esta guía de 8 pasos le muestra cómo usar la herramienta. Puede salir cuando quiera con «Salir» o la tecla Esc.'},
+{t:'Menú de formularios',d:'Aquí están los 61 formularios agrupados en 5 etapas. Los puntos de color indican el avance: gris sin iniciar, amarillo en curso, verde completo. Haga clic en cualquiera para abrirlo.'},
+{t:'El formulario',d:'Complete los campos. Los marcados con * son obligatorios. Todo se guarda automáticamente en su navegador mientras escribe.'},
+{t:'Navegar sin bloqueos',d:'«Anterior» y «Siguiente» recorren todos los formularios en orden, sin exigir que complete el actual. Alt+← y Alt+→ también funcionan.'},
+{t:'Guardar',d:'El guardado es automático, pero puede forzarlo con este botón. El indicador de la parte superior le confirma la hora del último guardado.'},
+{t:'Descargas en Excel',d:'Descargue cada formulario o grupos completos (por dominio, todo) en Excel: en blanco como plantilla con listas desplegables, o con los datos que ya llenó.'},
+{t:'Imprimir',d:'Imprime directamente sus datos guardados: un formulario, todo el trabajo, o los formatos en blanco para llenar a mano.'},
+{t:'Idioma, tema y copia',d:'Cambie entre español e inglés y entre modo claro y oscuro. En «⋯» puede exportar o importar una copia de seguridad (.json).'}]},
+en:{app_title:'IT Governance and Management Audit — COBIT 2019',app_sub:'Working papers · 5 domains · 40 objectives · Group 3',
+search_ph:'Search form or objective…',no_results:'No results',saved:'Saved',saving:'Saving…',saved_at:'Saved {t}',nosave:'No local storage (use .json backup)',
+downloads:'Downloads',print_btn:'Print',guide:'Guide',p_cur:'Print this form',p_all:'Print everything with data',p_all_blank:'Print everything blank',
+bk_export:'Export backup (.json)',bk_import:'Import backup',clear_all:'Delete all data',
+menu_btn:'⬇ Excel / 🖨 Print',x_empty:'⬇ Blank Excel (template)',x_filled:'⬇ Excel with my data',p_empty:'🖨 Print blank',p_filled:'🖨 Print with my data',
+sec_prep:'1 · Preparation',sec_eval:'2 · COBIT assessment (40 objectives)',sec_papers:'3 · Working papers',sec_results:'4 · Results',sec_close:'5 · Review and downloads',
+progress:'Overall progress (cover + 40 objectives)',step_of:'Form {a} of {b}',prev:'Previous',next:'Next',save:'Save',saved_toast:'Data saved in this browser',
+st_empty:'Not started',st_started:'In progress',st_done:'Complete',req_note:'* Required field',validate:'Validate',val_ok:'All required fields are complete',val_bad:'Required fields missing (marked in red)',
+add_row:'Add row',open_form:'Open',dom_done:'Completed',dom_avg:'Average level',dom_prog:'Progress',
+level:'Current level',target:'Target level',gap:'Gap',result:'Result',not_eval:'Not assessed',
+k_valued:'Factors rated',k_exig:'Demand index',k_exig_l:['Low demand','Medium demand','High demand'],k_scope:'Objectives in scope',k_of40:'of 40',k_nojust:'In scope, unjustified',k_prio:'High priority',
+k_eval:'Objectives assessed',k_gapavg:'Average gap',k_gapn:'With gap > 0',k_cumple:'Complies',k_parcial:'Partial',k_nocumple:'Does not comply',k_sineval:'Not assessed',k_conf:'% Conformity',k_find:'Findings recorded',k_act:'Actions recorded',
+dl_title:'Download center',dl_intro:'Download forms as Excel (blank as a template or with your data) or print them. Each pack groups several forms in a single file.',
+dl_packs:'Grouped packs (one file, several sheets)',dl_forms:'Individual forms (one file per form)',dl_all:'The whole audit work',dl_blank:'Blank',dl_filled:'With data',dl_xlsx:'Excel',dl_print:'Print',dl_backup:'Backup',dl_backup_txt:'Save your data to a .json file to move it to another computer or browser.',
+dl_n:'{n} forms',col_form:'Form',col_status:'Status',
+rev_title:'Final review',rev_intro:'Check that everything is complete before exporting or printing. Pending items are listed below; click to go to the form.',rev_pend:'Required items pending',rev_ok:'No required fields pending!',rev_general:'General data',rev_obj:'Results by objective',
+conf_clear:'Delete ALL saved data? This cannot be undone. (Download a .json backup first if you need it).',conf_ok:'Accept',conf_cancel:'Cancel',cleared:'Data deleted',imported:'Backup imported successfully',import_err:'Invalid file',
+storage_warn:'This browser blocks local storage. Use “Export backup” so you do not lose your data.',xl_missing:'The Excel library (ExcelJS) did not load. Check your internet connection and reload.',xl_ok:'Downloaded',xl_err:'Could not build the Excel file:',
+mode_blank:'BLANK FORM',mode_filled:'WITH DATA',generated:'Generated',scope_lbl:'Content',team:'Work team — Group 3',entity:'Audited entity',
+tour_skip:'Exit',tour_prev:'Previous',tour_next:'Next',tour_done:'Finish',
+tour:[
+{t:'Welcome!',d:'This 8-step guide shows you how to use the tool. Leave any time with “Exit” or the Esc key.'},
+{t:'Forms menu',d:'All 61 forms are grouped in 5 stages here. Colored dots show progress: gray not started, yellow in progress, green complete. Click any to open it.'},
+{t:'The form',d:'Fill in the fields. Those marked * are required. Everything is saved automatically in your browser as you type.'},
+{t:'Navigate freely',d:'“Previous” and “Next” walk through all forms in order without requiring the current one to be complete. Alt+← and Alt+→ also work.'},
+{t:'Save',d:'Saving is automatic, but you can force it with this button. The indicator at the top confirms the time of the last save.'},
+{t:'Excel downloads',d:'Download each form or whole groups (by domain, everything) as Excel: blank as a template with dropdown lists, or with the data you already entered.'},
+{t:'Print',d:'Print your saved data directly: one form, the whole work, or blank forms to fill in by hand.'},
+{t:'Language, theme and backup',d:'Switch between Spanish and English and between light and dark mode. In “⋯” you can export or import a backup (.json).'}]}
+};
+const t=(k,v)=>{let s=(UI[lang][k]!==undefined?UI[lang][k]:(UI.es[k]!==undefined?UI.es[k]:k));if(v&&typeof s==='string')Object.keys(v).forEach(x=>s=s.replace('{'+x+'}',v[x]));return s};
+
+/* =====================================================================
+   DATOS COBIT 2019
+   ===================================================================== */
+const DOMS={
+EDM:{color:'#6c3483',icon:'🏛',es:'Evaluar, Dirigir y Monitorear',en:'Evaluate, Direct and Monitor',
+ des:'El órgano de gobierno evalúa las opciones estratégicas, dirige a la gerencia y monitorea el logro de los objetivos.',den:'The governing body evaluates strategic options, directs management and monitors the achievement of objectives.'},
+APO:{color:'#1a5276',icon:'📐',es:'Alinear, Planificar y Organizar',en:'Align, Plan and Organize',
+ des:'Proporciona la dirección para la entrega de soluciones y servicios de TI: estrategia, arquitectura, innovación, portafolio, presupuesto, personas, relaciones, proveedores, calidad, riesgo, seguridad y datos.',den:'Provides direction for delivering I&T solutions and services: strategy, architecture, innovation, portfolio, budget, people, relationships, vendors, quality, risk, security and data.'},
+BAI:{color:'#0e6655',icon:'🔧',es:'Construir, Adquirir e Implementar',en:'Build, Acquire and Implement',
+ des:'Implementa el plan estratégico de TI: programas, proyectos, requisitos, soluciones, cambios, conocimiento, activos y configuración.',den:'Implements the I&T strategic plan: programs, projects, requirements, solutions, changes, knowledge, assets and configuration.'},
+DSS:{color:'#784212',icon:'🖥',es:'Entregar, Dar Servicio y Soporte',en:'Deliver, Service and Support',
+ des:'Entrega operativa de los servicios de TI: operaciones, solicitudes, incidentes, problemas, continuidad, seguridad y controles de negocio.',den:'Operational delivery of I&T services: operations, requests, incidents, problems, continuity, security and business controls.'},
+MEA:{color:'#1b4f72',icon:'📏',es:'Monitorear, Evaluar y Valorar',en:'Monitor, Evaluate and Assess',
+ des:'Evalúa el desempeño de TI, la conformidad con metas internas, los controles internos y los requisitos externos.',den:'Assesses I&T performance, conformance with internal goals, internal controls and external requirements.'}};
+const DOM_KEYS=Object.keys(DOMS);
+
+const OBJ=[
+['EDM01','Asegurar el establecimiento y mantenimiento del marco de gobierno','Ensured Governance Framework Setting and Maintenance','Analizar y articular los requisitos de un sistema de gobierno de I&T y establecer estructuras, principios, procesos y prácticas eficaces.','Analyze and articulate the requirements for I&T governance and put in place effective structures, principles, processes and practices.'],
+['EDM02','Asegurar la entrega de beneficios','Ensured Benefits Delivery','Asegurar que las inversiones y servicios de I&T generen el máximo valor para el negocio.','Ensure that I&T investments and services deliver maximum value to the business.'],
+['EDM03','Asegurar la optimización del riesgo','Ensured Risk Optimization','Asegurar que el apetito y la tolerancia al riesgo se entiendan y que el riesgo de I&T se gestione apropiadamente.','Ensure that risk appetite and tolerance are understood and I&T risk is managed appropriately.'],
+['EDM04','Asegurar la optimización de recursos','Ensured Resource Optimization','Asegurar que las capacidades de I&T (personas, procesos y tecnología) sean adecuadas para los objetivos empresariales.','Ensure that I&T capabilities (people, process, technology) are adequate to meet enterprise objectives.'],
+['EDM05','Asegurar el involucramiento de las partes interesadas','Ensured Stakeholder Engagement','Asegurar que las partes interesadas sean identificadas, involucradas y sus necesidades gestionadas.','Ensure that stakeholders are identified and engaged and their needs are managed.'],
+['APO01','Gestionar el marco de gestión de I&T','Managed I&T Management Framework','Clarificar y mantener la misión y visión de gobierno y gestión de TI; implementar mecanismos y autoridades para la gestión de I&T.','Clarify and maintain the I&T governance and management mission and vision; implement management mechanisms and authorities.'],
+['APO02','Gestionar la estrategia','Managed Strategy','Proporcionar una visión holística del negocio y del entorno de TI actuales, la dirección futura y las iniciativas necesarias para llegar a ella.','Provide a holistic view of the current business and IT environment, the future direction and the initiatives needed to get there.'],
+['APO03','Gestionar la arquitectura empresarial','Managed Enterprise Architecture','Establecer una arquitectura común de procesos de negocio, información, datos, aplicaciones y tecnología.','Establish a common architecture of business processes, information, data, applications and technology.'],
+['APO04','Gestionar la innovación','Managed Innovation','Mantener conciencia de las tendencias de TI e identificar oportunidades de innovación que creen valor para el negocio.','Maintain awareness of IT trends and identify innovation opportunities that create value for the business.'],
+['APO05','Gestionar el portafolio','Managed Portfolio','Ejecutar la orientación estratégica de las inversiones de I&T alineadas con la arquitectura empresarial y las características deseadas del portafolio.','Execute the strategic direction of I&T investments aligned with the enterprise architecture and desired portfolio characteristics.'],
+['APO06','Gestionar el presupuesto y los costes','Managed Budget and Costs','Gestionar las actividades financieras de TI: presupuesto, costes y beneficios de las inversiones.','Manage the I&T-related financial activities: budget, costs and benefits of investments.'],
+['APO07','Gestionar los recursos humanos','Managed Human Resources','Proporcionar un enfoque estructurado para asegurar la estructura óptima, la toma de decisiones y las habilidades del personal de TI.','Provide a structured approach to ensure optimal structuring, decision-making capability and skills of I&T staff.'],
+['APO08','Gestionar las relaciones','Managed Relationships','Gestionar la relación entre el negocio y TI de manera formal y transparente, enfocada en resultados empresariales satisfactorios.','Manage the relationship between business and IT in a formal and transparent way focused on satisfactory business outcomes.'],
+['APO09','Gestionar los acuerdos de servicio','Managed Service Agreements','Alinear los servicios y niveles de servicio de TI con las necesidades y expectativas de la empresa.','Align I&T services and service levels with enterprise needs and expectations.'],
+['APO10','Gestionar los proveedores','Managed Vendors','Gestionar los servicios de TI prestados por proveedores externos minimizando el riesgo asociado a terceros.','Manage I&T services provided by vendors to meet business requirements while minimizing third-party risk.'],
+['APO11','Gestionar la calidad','Managed Quality','Definir y comunicar los requisitos de calidad en procesos, procedimientos y resultados de TI; controlar la calidad con métricas.','Define and communicate quality requirements in all processes, procedures and outcomes; control quality using metrics.'],
+['APO12','Gestionar el riesgo','Managed Risk','Identificar, evaluar y reducir los riesgos relacionados con TI de manera continua dentro de los niveles de tolerancia.','Continually identify, assess and reduce I&T-related risk within tolerance levels.'],
+['APO13','Gestionar la seguridad','Managed Security','Definir, operar y monitorear un sistema de gestión de seguridad de la información (confidencialidad, integridad y disponibilidad).','Define, operate and monitor an information security management system (confidentiality, integrity and availability).'],
+['APO14','Gestionar los datos','Managed Data','Gestionar los datos como un activo empresarial para satisfacer los requisitos de información y proveer datos de calidad.','Manage data as an enterprise asset to meet information requirements and provide quality data.'],
+['BAI01','Gestionar programas','Managed Programs','Gestionar los programas del portafolio de inversiones de forma alineada con la estrategia empresarial.','Manage all programs from the investment portfolio in alignment with enterprise strategy.'],
+['BAI02','Gestionar la definición de requisitos','Managed Requirements Definition','Identificar soluciones y analizar requisitos antes de la adquisición o creación, alineados con los requisitos estratégicos.','Identify solutions and analyze requirements before acquisition or creation, aligned with strategic requirements.'],
+['BAI03','Gestionar la identificación y construcción de soluciones','Managed Solutions Identification and Build','Establecer y mantener soluciones alineadas con los requisitos: diseño, desarrollo, adquisición y pruebas.','Establish and maintain solutions aligned with requirements: design, development, procurement and testing.'],
+['BAI04','Gestionar la disponibilidad y capacidad','Managed Availability and Capacity','Mantener disponibilidad, rendimiento y capacidad de servicios e infraestructura para equilibrar la demanda actual y futura.','Maintain availability, performance and capacity of services and infrastructure to balance current and future demand.'],
+['BAI05','Gestionar el cambio organizacional','Managed Organizational Change','Maximizar la probabilidad de implementar con éxito el cambio organizacional relacionado con TI, con riesgo reducido.','Maximize the likelihood of successfully implementing sustainable I&T-enabled organizational change with reduced risk.'],
+['BAI06','Gestionar los cambios de TI','Managed IT Changes','Gestionar los cambios en infraestructura, aplicaciones y procesos de forma controlada, minimizando el impacto en producción.','Manage all changes in a controlled manner, minimizing the impact on the production environment.'],
+['BAI07','Gestionar la aceptación del cambio y la transición','Managed IT Change Acceptance and Transitioning','Aceptar formalmente y hacer operativas las nuevas soluciones: planificación, conversión, pruebas de aceptación y comunicación.','Formally accept and make operational new solutions: planning, conversion, acceptance testing and communication.'],
+['BAI08','Gestionar el conocimiento','Managed Knowledge','Mantener disponible conocimiento relevante, actual y validado; fomentar una cultura de intercambio de conocimiento.','Maintain the availability of relevant, current, validated knowledge; foster a knowledge-sharing culture.'],
+['BAI09','Gestionar los activos','Managed Assets','Gestionar los activos de TI en su ciclo de vida para asegurar valor al costo óptimo, contabilizados y protegidos.','Manage I&T assets through their life cycle to ensure value at optimal cost, accounted for and protected.'],
+['BAI10','Gestionar la configuración','Managed Configuration','Definir y mantener las descripciones y relaciones entre los recursos y capacidades clave de TI (CMDB).','Define and maintain descriptions and relationships between key I&T resources and capabilities (CMDB).'],
+['BAI11','Gestionar proyectos','Managed Projects','Gestionar los proyectos de TI del portafolio alineados con la estrategia, siguiendo metodologías de gestión de proyectos.','Manage all I&T projects initiated within the portfolio in alignment with strategy, following project management methodology.'],
+['DSS01','Gestionar las operaciones','Managed Operations','Coordinar y ejecutar las actividades y procedimientos operativos requeridos para prestar los servicios de TI.','Coordinate and execute the activities and operational procedures required to deliver I&T services.'],
+['DSS02','Gestionar las solicitudes e incidentes de servicio','Managed Service Requests and Incidents','Responder oportuna y efectivamente a solicitudes e incidentes: restauración del servicio y gestión de solicitudes.','Provide timely and effective response to user requests and incidents: service restoration and request fulfillment.'],
+['DSS03','Gestionar los problemas','Managed Problems','Identificar y clasificar problemas, investigar causas raíz y resolverlos de forma proactiva para evitar recurrencia.','Identify and classify problems, investigate root causes and resolve proactively to prevent recurrence.'],
+['DSS04','Gestionar la continuidad','Managed Continuity','Establecer y mantener planes que permitan al negocio y a TI responder a interrupciones y continuar los procesos críticos.','Establish and maintain plans enabling the business and IT to respond to disruptions and continue critical processes.'],
+['DSS05','Gestionar los servicios de seguridad','Managed Security Services','Proteger la información empresarial manteniendo el riesgo de seguridad en un nivel aceptable según la política.','Protect enterprise information to maintain an acceptable level of information security risk per the security policy.'],
+['DSS06','Gestionar los controles de los procesos de negocio','Managed Business Process Controls','Definir y mantener controles apropiados de procesos de negocio para que la información y los sistemas sean seguros y confiables.','Define and maintain appropriate business process controls so information and systems are secure and reliable.'],
+['MEA01','Gestionar el monitoreo del rendimiento y la conformidad','Managed Performance and Conformance Monitoring','Recolectar, validar y evaluar métricas de negocio y de TI para verificar que los procesos cumplen los objetivos.','Collect, validate and evaluate business and I&T metrics to verify that processes perform against targets.'],
+['MEA02','Gestionar el sistema de control interno','Managed System of Internal Control','Mantener un sistema de control interno que dé confianza a las partes interesadas mediante autoevaluación continua.','Maintain a system of internal control that gives stakeholders confidence through continuous self-assessment.'],
+['MEA03','Gestionar el cumplimiento con requerimientos externos','Managed Compliance With External Requirements','Evaluar que los procesos de TI y de negocio soportados por TI cumplan leyes, regulaciones y contratos.','Evaluate that I&T and I&T-supported business processes comply with laws, regulations and contractual requirements.'],
+['MEA04','Gestionar el aseguramiento','Managed Assurance','Planificar, alcanzar y mantener un nivel de aseguramiento adecuado sobre el sistema de control interno de TI.','Plan, scope and execute assurance initiatives to provide adequate assurance over the I&T internal control system.']
+].map(a=>({cod:a[0],dom:a[0].slice(0,3),es:a[1],en:a[2],des:a[3],den:a[4]}));
+
+const LEVELS=[
+{es:'Incompleto',en:'Incomplete',d:{es:'El proceso no está implementado o no logra su propósito.',en:'The process is not implemented or fails to achieve its purpose.'}},
+{es:'Realizado',en:'Performed',d:{es:'El proceso logra su propósito de forma básica; no se gestiona formalmente.',en:'The process achieves its purpose in a basic way; it is not formally managed.'}},
+{es:'Gestionado',en:'Managed',d:{es:'El proceso está planificado, monitoreado y ajustado; los productos de trabajo están controlados.',en:'The process is planned, monitored and adjusted; work products are controlled.'}},
+{es:'Establecido',en:'Established',d:{es:'El proceso se basa en un proceso estándar de la organización, con adaptaciones permitidas.',en:'The process is based on an organizational standard process, with permitted tailoring.'}},
+{es:'Predecible',en:'Predictable',d:{es:'El proceso opera dentro de límites definidos; se gestiona con mediciones cuantitativas.',en:'The process operates within defined limits and is managed with quantitative measurements.'}},
+{es:'Optimizado',en:'Optimizing',d:{es:'El proceso se mejora continuamente analizando las causas de las variaciones.',en:'The process is continually improved by analyzing the causes of variation.'}}];
+
+const DF=[
+{es:'Estrategia empresarial',en:'Enterprise strategy',d:{es:'Crecimiento/adquisición, innovación, liderazgo en costes, servicio al cliente',en:'Growth/acquisition, innovation, cost leadership, client service'}},
+{es:'Metas empresariales',en:'Enterprise goals',d:{es:'Rentabilidad, cumplimiento regulatorio, satisfacción del cliente, eficiencia',en:'Profitability, regulatory compliance, customer satisfaction, efficiency'}},
+{es:'Perfil de riesgo',en:'Risk profile',d:{es:'Apetito y tolerancia al riesgo, exposición actual al riesgo de TI',en:'Risk appetite and tolerance, current I&T risk exposure'}},
+{es:'Problemas relacionados con I&T',en:'I&T-related issues',d:{es:'Incidentes frecuentes, proyectos fallidos, brechas de seguridad',en:'Frequent incidents, failed projects, security breaches'}},
+{es:'Panorama de amenazas',en:'Threat landscape',d:{es:'Amenazas externas, ciberriesgos, regulaciones emergentes',en:'External threats, cyber risks, emerging regulations'}},
+{es:'Requisitos de cumplimiento',en:'Compliance requirements',d:{es:'Leyes, regulaciones sectoriales, contratos, estándares',en:'Laws, sector regulations, contracts, standards'}},
+{es:'Rol de TI',en:'Role of IT',d:{es:'TI como soporte, factor de crecimiento o diferenciador estratégico',en:'IT as support, growth factor or strategic differentiator'}},
+{es:'Modelo de aprovisionamiento de TI',en:'Sourcing model for IT',d:{es:'Interno, outsourcing, nube, híbrido',en:'In-house, outsourcing, cloud, hybrid'}},
+{es:'Métodos de implementación de TI',en:'IT implementation methods',d:{es:'Ágil, cascada, DevOps, contratos bajo demanda',en:'Agile, waterfall, DevOps, on-demand contracts'}},
+{es:'Estrategia de adopción de tecnología',en:'Technology adoption strategy',d:{es:'Pionero, seguidor o adopción tardía de tecnologías nuevas',en:'First mover, follower or slow adopter of new technologies'}},
+{es:'Tamaño de la empresa',en:'Enterprise size',d:{es:'Grande, mediana o pequeña; centralizada o descentralizada',en:'Large, medium or small; centralized or decentralized'}}];
+
+const MEMBERS=[['Amoloto Diego','#6c3483'],['Ayavaca Gustavo','#2980b9'],['Chicaiza Jeniffer','#27ae60'],['Chicaiza Kelly','#e67e22'],['Guanoliquin Carlos','#16a085'],['Loachamin Gabriela','#c0392b'],['Quispe Neiser','#8e44ad'],['Sangucho Jeniffer','#d4ac0d'],['Tituaña Patricio','#1b4f72'],['Toaquiza William','#7d6608'],['Yanguicela Diego','#943126']];
+const initials=n=>{const p=n.split(' ');return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase()};
+
+/* =====================================================================
+   OPCIONES REUTILIZABLES
+   ===================================================================== */
+const OPT_LVL=LEVELS.map((l,i)=>({v:String(i),es:i+' - '+l.es,en:i+' - '+l.en}));
+const OPT_NUM=LEVELS.map((l,i)=>({v:String(i),es:String(i),en:String(i)}));
+const OPT_RES=[{v:'cumple',es:'Cumple',en:'Complies'},{v:'parcial',es:'Parcial',en:'Partial'},{v:'nocumple',es:'No cumple',en:'Does not comply'}];
+const OPT_OBJ=OBJ.map(o=>({v:o.cod,es:o.cod,en:o.cod}));
+const OPT_YNP=[{v:'si',es:'Sí',en:'Yes'},{v:'no',es:'No',en:'No'},{v:'parcial',es:'Parcial',en:'Partial'}];
+const OPT_YN=[{v:'si',es:'Sí',en:'Yes'},{v:'no',es:'No',en:'No'}];
+const OPT_SCORE=[{v:'100',es:'100',en:'100'},{v:'50',es:'50',en:'50'},{v:'0',es:'0',en:'0'}];
+const OPT_LMH=[{v:'1',es:'Bajo',en:'Low'},{v:'2',es:'Medio',en:'Medium'},{v:'3',es:'Alto',en:'High'}];
+const OPT_PRIO=[{v:'alta',es:'Alta',en:'High'},{v:'media',es:'Media',en:'Medium'},{v:'baja',es:'Baja',en:'Low'}];
+const OPT_RESID=[{v:'bajo',es:'Bajo',en:'Low'},{v:'medio',es:'Medio',en:'Medium'},{v:'alto',es:'Alto',en:'High'}];
+
+/* =====================================================================
+   REGISTRO DE FORMULARIOS (única fuente para pantalla, Excel e impresión)
+   field: {k,type,es,en,req,full,ph,def,opts,hint,min,max,w}
+   table: {key,title,cols:[{k,type|sv|calc,es,en,w,opts,def,min,max}],rows:n|[...],addable}
+   ===================================================================== */
+const FORMS={};
+const T=(es,en)=>({es,en});
+function getVal(id,def){return Object.prototype.hasOwnProperty.call(STATE,id)?STATE[id]:(def===undefined||def===null?'':def)}
+const fid=(f,k)=>f.id+'.'+k;
+const cid=(f,tb,i,k)=>f.id+'.'+tb.key+'.'+i+'.'+k;
+const extraKey=(f,tb)=>f.id+'.'+tb.key+'.__extra';
+function rowCount(f,tb,filled=true){
+  if(Array.isArray(tb.rows))return tb.rows.length;
+  return tb.rows+(filled&&tb.addable?(parseInt(STATE[extraKey(f,tb)])||0):0);
+}
+const optsOf=c=>c.opts==='OBJ'?OPT_OBJ:(c.opts||[]);
+function disp(c,v){
+  if(v===undefined||v===null||v==='')return '';
+  if(c.type==='select'){const o=optsOf(c).find(x=>String(x.v)===String(v));return o?L(o):String(v)}
+  if(c.type==='number'){const n=Number(v);return isFinite(n)?n:String(v)}
+  return String(v);
+}
+const rowGetter=(f,tb,i)=>k=>{const c=tb.cols.find(x=>x.k===k);return getVal(cid(f,tb,i,k),c&&c.def?c.def(i):'')};
+const def=(es,en)=>({es,en});
+const reg=f=>{FORMS[f.id]=f;return f};
+
+reg({id:'portada',sec:'prep',icon:'📄',es:'Portada · Datos de la auditoría',en:'Cover · Audit data',
+ intro:T('Complete la información general. Los campos con * son obligatorios y aparecen en la portada del informe.','Fill in the general information. Fields marked * are required and appear on the report cover.'),
+ fields:[
+ {k:'entidad',type:'text',es:'Entidad auditada',en:'Audited entity',req:1,ph:T('Empresa Ejemplo S.A.','Example Company Ltd.')},
+ {k:'area',type:'text',es:'Unidad / área auditada',en:'Unit / area audited',req:1,ph:T('Gerencia de Tecnología','Technology Management')},
+ {k:'periodo',type:'text',es:'Período evaluado',en:'Evaluation period',req:1,ph:T('01/01/2026 - 30/09/2026','01/01/2026 - 09/30/2026')},
+ {k:'auditor',type:'text',es:'Auditor líder',en:'Lead auditor',req:1,ph:T('Nombre Apellido','First Last')},
+ {k:'equipo',type:'text',es:'Equipo auditor',en:'Audit team',ph:T('Auditor 1, Auditor 2','Auditor 1, Auditor 2')},
+ {k:'fecha_ini',type:'date',es:'Fecha de inicio',en:'Start date'},
+ {k:'fecha_fin',type:'date',es:'Fecha de cierre',en:'End date'},
+ {k:'norma',type:'static',es:'Referencia normativa',en:'Normative reference',sv:()=>'COBIT 2019 (ISACA)'},
+ {k:'version',type:'static',es:'Versión del papel de trabajo',en:'Working paper version',sv:()=>'4.0'},
+ {k:'grupo',type:'static',full:1,es:'Equipo de trabajo — Grupo 3',en:'Work team — Group 3',sv:()=>MEMBERS.map(m=>m[0]).join(', ')},
+ {k:'objetivo',type:'textarea',full:1,es:'Objetivo de la auditoría',en:'Audit objective',
+  def:def('Evaluar el nivel de capacidad de los 40 objetivos de gobierno y gestión de I&T conforme a COBIT 2019.','Assess the capability level of the 40 I&T governance and management objectives according to COBIT 2019.')}],
+ extra:()=>`<div class="card"><h2>🎓 ${esc(t('team'))}</h2><ul class="team">${MEMBERS.map(m=>`<li class="member"><span class="avatar" style="background:${m[1]}">${initials(m[0])}</span><span>${esc(m[0])}</span></li>`).join('')}</ul></div>`});
+
+reg({id:'contexto',sec:'prep',icon:'🏢',es:'Contexto de la entidad',en:'Entity context',
+ intro:T('Entendimiento del negocio antes de aplicar los factores de diseño.','Business understanding before applying the design factors.'),
+ fields:[
+ {k:'mision',type:'textarea',es:'Misión / visión',en:'Mission / vision',ph:T('Misión y visión de la organización…','Organization mission and vision…')},
+ {k:'estrategia',type:'textarea',es:'Estrategia del negocio',en:'Business strategy',ph:T('Crecimiento, innovación, eficiencia…','Growth, innovation, efficiency…')},
+ {k:'estructura',type:'textarea',es:'Estructura organizacional (TI)',en:'Organizational structure (IT)',ph:T('Organigrama, comités, dependencias…','Org chart, committees, reporting lines…')},
+ {k:'procesos',type:'textarea',es:'Principales procesos de negocio',en:'Key business processes',ph:T('Procesos core y sistemas de soporte…','Core processes and supporting systems…')},
+ {k:'regulatorio',type:'textarea',es:'Marco regulatorio aplicable',en:'Applicable regulatory framework',ph:T('Leyes, normas sectoriales, protección de datos…','Laws, sector rules, data protection…')},
+ {k:'historial',type:'textarea',es:'Historial de auditorías previas',en:'Previous audit history',ph:T('Hallazgos abiertos, auditorías anteriores…','Open findings, previous audits…')},
+ {k:'madurez',type:'select',es:'Madurez percibida de I&T',en:'Perceived I&T maturity',opts:[{v:'baja',es:'Baja',en:'Low'},{v:'media',es:'Media',en:'Medium'},{v:'alta',es:'Alta',en:'High'}]}]});
+
+reg({id:'escalas',sec:'prep',icon:'📊',es:'Escalas de referencia',en:'Reference scales',
+ intro:T('Modelo de niveles de capacidad de COBIT 2019 (0-5). Solo consulta: sirve de guía al asignar el nivel de cada objetivo.','COBIT 2019 capability level model (0-5). Reference only: use it as a guide when assigning each objective level.'),
+ tables:[{key:'t',rows:LEVELS,cols:[
+  {k:'n',sv:i=>i,es:'Nivel',en:'Level',w:8},{k:'nm',sv:i=>L(LEVELS[i]),es:'Nombre',en:'Name',w:18},{k:'d',sv:i=>L(LEVELS[i].d),es:'Descripción',en:'Description',w:80}]}]});
+
+reg({id:'factores',sec:'prep',icon:'⚙️',es:'Factores de diseño',en:'Design factors',
+ intro:T('Valore cada uno de los 11 factores de diseño (Bajo/Medio/Alto) y asigne un peso de 1 a 5. Determinan las prioridades del sistema de gobierno.','Rate each of the 11 design factors (Low/Medium/High) and assign a weight from 1 to 5. They determine the governance system priorities.'),
+ kpis:()=>{const f=FORMS.factores,tb=f.tables[0];let v=0,sp=0,sm=0;
+   DF.forEach((_,i)=>{const g=rowGetter(f,tb,i),val=+g('val'),pe=+g('peso');if(g('val')!=='')v++;if(val&&pe){sp+=val*pe;sm+=3*pe}});
+   const idx=sm?Math.round(sp/sm*100):null,l=t('k_exig_l');
+   return [{l:t('k_valued'),v:v+' / 11'},{l:t('k_exig'),v:idx===null?'—':idx+'%',c:idx===null?'':idx>=84?'danger':idx>=50?'warning':'success',s:idx===null?'':l[idx>=84?2:idx>=50?1:0]}]},
+ tables:[{key:'t',rows:DF,cols:[
+  {k:'n',sv:i=>i+1,es:'N°',en:'#',w:5},{k:'f',sv:i=>L(DF[i]),es:'Factor de diseño',en:'Design factor',w:30},{k:'d',sv:i=>L(DF[i].d),es:'Qué evaluar',en:'What to assess',w:46},
+  {k:'val',type:'select',opts:OPT_LMH,es:'Valoración',en:'Rating',w:14},{k:'peso',type:'number',min:1,max:5,es:'Peso (1-5)',en:'Weight (1-5)',w:11},
+  {k:'pts',calc:g=>{const v=+g('val'),p=+g('peso');return v&&p?v*p:''},es:'Puntaje',en:'Score',w:10},{k:'obs',type:'text',es:'Observaciones',en:'Notes',w:34}]}]});
+
+reg({id:'alcance',sec:'prep',icon:'🎯',es:'Alcance: 40 objetivos',en:'Scope: 40 objectives',
+ intro:T('Defina prioridad, inclusión en el alcance, nivel meta y justificación para cada objetivo.','Define priority, inclusion in scope, target level and justification for each objective.'),
+ kpis:()=>{const f=FORMS.alcance,tb=f.tables[0];let a=0,sj=0,hi=0;
+   OBJ.forEach((_,i)=>{const g=rowGetter(f,tb,i);if(g('inc')==='si'){a++;if(!String(g('just')).trim())sj++}if(g('prio')==='alta')hi++});
+   return [{l:t('k_scope'),v:a,s:t('k_of40')},{l:t('k_nojust'),v:sj,c:sj?'danger':'success'},{l:t('k_prio'),v:hi}]},
+ tables:[{key:'t',rows:OBJ,cols:[
+  {k:'cod',sv:i=>OBJ[i].cod,es:'Código',en:'Code',w:10},{k:'dom',sv:i=>OBJ[i].dom,es:'Dominio',en:'Domain',w:9},{k:'nom',sv:i=>L(OBJ[i]),es:'Objetivo',en:'Objective',w:46},
+  {k:'prio',type:'select',opts:OPT_PRIO,es:'Prioridad',en:'Priority',w:12},{k:'inc',type:'select',opts:OPT_YN,es:'En alcance',en:'In scope',w:11},
+  {k:'meta',type:'select',opts:OPT_NUM,es:'Nivel meta',en:'Target level',w:11},{k:'just',type:'text',es:'Justificación',en:'Justification',w:40}]}]});
+
+/* ---- 40 objetivos ---- */
+const OBJ_FIELDS=[
+ {k:'auditor',type:'text',es:'Auditor responsable',en:'Responsible auditor'},
+ {k:'fecha',type:'date',es:'Fecha de evaluación',en:'Evaluation date'},
+ {k:'nivel',type:'select',opts:OPT_LVL,req:1,es:'Nivel actual',en:'Current level',hint:v=>v===''?'':L(LEVELS[+v].d)},
+ {k:'meta',type:'select',opts:OPT_LVL,es:'Nivel meta',en:'Target level'},
+ {k:'resultado',type:'select',opts:OPT_RES,req:1,es:'Resultado general',en:'Overall result'},
+ {k:'evidencia',type:'text',es:'Ref. evidencia',en:'Evidence ref.',ph:T('EV-001','EV-001')},
+ {k:'desc',type:'textarea',full:1,es:'Descripción de la práctica existente',en:'Description of the existing practice',ph:T('Describa cómo se realiza este proceso en la entidad…','Describe how this process is carried out in the entity…')},
+ {k:'hallazgo',type:'textarea',full:1,es:'Hallazgos',en:'Findings',ph:T('Brechas o deficiencias encontradas…','Gaps or deficiencies found…')},
+ {k:'recom',type:'textarea',full:1,es:'Recomendación',en:'Recommendation',ph:T('Acciones recomendadas…','Recommended actions…')}];
+const CRIT_GEN=[T('Existe política o procedimiento documentado y aprobado','A documented and approved policy or procedure exists'),T('Roles y responsabilidades asignados','Roles and responsibilities are assigned'),
+ T('Se ejecuta de forma consistente (hay evidencia de operación)','It is performed consistently (operating evidence exists)'),T('Se mide y monitorea con indicadores o métricas','It is measured and monitored with KPIs or metrics'),T('Se revisa y mejora periódicamente','It is periodically reviewed and improved')];
+const CRIT_EDM01=[T('Política de gobierno de TI aprobada por la alta dirección','IT governance policy approved by senior management'),T('Comité de gobierno de TI formal y activo','Formal and active IT governance committee'),
+ T('Principios de gobierno documentados y comunicados','Governance principles documented and communicated'),T('Revisión y actualización periódica del marco','Periodic review and update of the framework'),T('Responsabilidades de gobierno claramente asignadas','Governance responsibilities clearly assigned')];
+OBJ.forEach(o=>{
+  const id=o.cod.toLowerCase(),crit=o.cod==='EDM01'?CRIT_EDM01:CRIT_GEN,D=DOMS[o.dom];
+  reg({id,sec:'eval',dom:o.dom,color:D.color,icon:D.icon,code:o.cod,es:o.cod+' · '+o.es,en:o.cod+' · '+o.en,intro:{es:o.des,en:o.den},fields:OBJ_FIELDS,
+   tables:[{key:'c',title:T('Criterios de evaluación','Assessment criteria'),rows:crit,cols:[
+    {k:'crit',sv:i=>L(crit[i]),es:'Criterio de evaluación',en:'Assessment criterion',w:48},{k:'ex',type:'select',opts:OPT_YNP,es:'¿Existe?',en:'Exists?',w:12},
+    {k:'ev',type:'text',es:'Evidencia',en:'Evidence',w:30},{k:'pt',type:'select',opts:OPT_SCORE,es:'Puntaje',en:'Score',w:10},{k:'ob',type:'text',es:'Observación',en:'Remarks',w:30}]}]});
+});
+
+/* ---- Papeles de trabajo ---- */
+const pn=i=>i+1;
+reg({id:'riesgos',sec:'papers',icon:'⚠️',es:'Matriz de riesgos de la auditoría',en:'Audit risk matrix',
+ intro:T('Riesgos propios del trabajo de auditoría. El nivel se calcula solo: probabilidad × impacto.','Risks inherent to the audit work. The level is calculated automatically: likelihood × impact.'),
+ tables:[{key:'t',rows:8,addable:1,cols:[
+  {k:'n',sv:i=>pn(i),es:'#',en:'#',w:5},{k:'desc',type:'textarea',es:'Descripción del riesgo',en:'Risk description',w:40},{k:'proc',type:'select',opts:'OBJ',es:'Proceso COBIT',en:'COBIT process',w:12},
+  {k:'prob',type:'select',opts:OPT_LMH,es:'Probabilidad',en:'Likelihood',w:13},{k:'imp',type:'select',opts:OPT_LMH,es:'Impacto',en:'Impact',w:11},
+  {k:'niv',calc:g=>{const p=+g('prob'),i=+g('imp');if(!p||!i)return '';const s=p*i;return s>=9?(lang==='es'?'Crítico':'Critical'):s>=6?(lang==='es'?'Alto':'High'):s>=3?(lang==='es'?'Medio':'Medium'):(lang==='es'?'Bajo':'Low')},es:'Nivel de riesgo',en:'Risk level',w:14},
+  {k:'ctl',type:'text',es:'Control existente',en:'Existing control',w:30},{k:'res',type:'select',opts:OPT_RESID,es:'Riesgo residual',en:'Residual risk',w:14}]}]});
+
+reg({id:'evidencias',sec:'papers',icon:'📥',es:'Registro de evidencias',en:'Evidence register',
+ intro:T('Documente toda la evidencia recopilada o solicitada durante la auditoría.','Document all evidence collected or requested during the audit.'),
+ tables:[{key:'t',rows:10,addable:1,cols:[
+  {k:'ref',type:'text',def:i=>'EV-'+pad(i+1),es:'Ref.',en:'Ref.',w:10},{k:'desc',type:'text',es:'Descripción',en:'Description',w:38},
+  {k:'tipo',type:'select',opts:[{v:'doc',es:'Documento',en:'Document'},{v:'ent',es:'Entrevista',en:'Interview'},{v:'obs',es:'Observación',en:'Observation'},{v:'cap',es:'Captura de pantalla',en:'Screenshot'},{v:'log',es:'Log / reporte',en:'Log / report'}],es:'Tipo',en:'Type',w:18},
+  {k:'proc',type:'select',opts:'OBJ',es:'Proceso COBIT',en:'COBIT process',w:12},{k:'fecha',type:'date',es:'Fecha de obtención',en:'Date obtained',w:14},
+  {k:'por',type:'text',es:'Obtenido por',en:'Obtained by',w:20},{k:'alm',type:'text',es:'Almacenamiento',en:'Storage',w:22},
+  {k:'est',type:'select',opts:[{v:'obt',es:'Obtenido',en:'Obtained'},{v:'pen',es:'Pendiente',en:'Pending'},{v:'rev',es:'Revisado',en:'Reviewed'}],es:'Estado',en:'Status',w:13}]}]});
+
+reg({id:'programa',sec:'papers',icon:'📋',es:'Programa de auditoría',en:'Audit program',
+ intro:T('Planifique las actividades de auditoría, responsables y fechas.','Plan the audit activities, owners and dates.'),
+ tables:[{key:'t',rows:10,addable:1,cols:[
+  {k:'n',sv:i=>pn(i),es:'#',en:'#',w:5},{k:'act',type:'text',es:'Actividad',en:'Activity',w:38},{k:'proc',type:'select',opts:'OBJ',es:'Proceso COBIT',en:'COBIT process',w:12},
+  {k:'tec',type:'select',opts:[{v:'ent',es:'Entrevista',en:'Interview'},{v:'rev',es:'Revisión documental',en:'Document review'},{v:'obs',es:'Observación',en:'Observation'},{v:'mue',es:'Muestreo',en:'Sampling'},{v:'ana',es:'Análisis',en:'Analysis'},{v:'rec',es:'Recálculo',en:'Recalculation'}],es:'Técnica',en:'Technique',w:20},
+  {k:'resp',type:'text',es:'Responsable',en:'Owner',w:20},{k:'ini',type:'date',es:'Fecha inicio',en:'Start date',w:14},{k:'fin',type:'date',es:'Fecha fin',en:'End date',w:14},
+  {k:'est',type:'select',opts:[{v:'pen',es:'Pendiente',en:'Pending'},{v:'pro',es:'En proceso',en:'In progress'},{v:'com',es:'Completada',en:'Completed'}],es:'Estado',en:'Status',w:13},{k:'obs',type:'text',es:'Observaciones',en:'Notes',w:28}]}]});
+
+reg({id:'muestreo',sec:'papers',icon:'🔬',es:'Plan de muestreo',en:'Sampling plan',
+ intro:T('Defina la metodología y el tamaño de muestra para las pruebas de auditoría.','Define the methodology and sample size for audit tests.'),
+ fields:[
+ {k:'metodologia',type:'select',es:'Metodología de muestreo',en:'Sampling methodology',opts:[{v:'alea',es:'Muestreo aleatorio simple',en:'Simple random sampling'},{v:'sist',es:'Muestreo sistemático',en:'Systematic sampling'},{v:'cong',es:'Muestreo por conglomerados',en:'Cluster sampling'},{v:'juic',es:'Muestreo de juicio',en:'Judgmental sampling'},{v:'atri',es:'Muestreo de atributos',en:'Attribute sampling'}]},
+ {k:'confianza',type:'select',es:'Nivel de confianza',en:'Confidence level',opts:[{v:'90',es:'90%',en:'90%'},{v:'95',es:'95%',en:'95%'},{v:'99',es:'99%',en:'99%'}]},
+ {k:'error',type:'text',es:'Error tolerable',en:'Tolerable error',ph:T('Ej.: 5%','e.g. 5%')},
+ {k:'universo',type:'number',min:0,es:'Universo total',en:'Total population',ph:T('N.° de transacciones','No. of transactions')},
+ {k:'muestra',type:'number',min:0,es:'Tamaño de muestra',en:'Sample size'},
+ {k:'just',type:'textarea',full:1,es:'Justificación del muestreo',en:'Sampling justification',ph:T('Fundamente la metodología y el tamaño de muestra…','Support the methodology and sample size…')}],
+ tables:[{key:'t',title:T('Muestra por proceso','Sample by process'),rows:15,addable:1,cols:[
+  {k:'n',sv:i=>pn(i),es:'#',en:'#',w:5},{k:'proc',type:'select',opts:'OBJ',def:i=>OBJ[i]?OBJ[i].cod:'',es:'Proceso',en:'Process',w:12},
+  {k:'univ',type:'number',min:0,es:'Universo',en:'Population',w:12},{k:'mues',type:'number',min:0,es:'Muestra',en:'Sample',w:12},
+  {k:'pct',calc:g=>{const u=+g('univ'),m=+g('mues');return u>0&&g('mues')!==''?(m/u*100).toFixed(1)+'%':''},es:'% Muestra',en:'% Sample',w:11},
+  {k:'crit',type:'select',opts:[{v:'alea',es:'Aleatorio',en:'Random'},{v:'sist',es:'Sistemático',en:'Systematic'},{v:'juic',es:'Juicio',en:'Judgment'}],es:'Criterio de selección',en:'Selection criterion',w:20},{k:'per',type:'text',es:'Período',en:'Period',w:18}]}]});
+
+/* ---- Resultados ---- */
+const NIVEL_OF=o=>getVal(o.cod.toLowerCase()+'.nivel','');
+const META_OF=o=>getVal(o.cod.toLowerCase()+'.meta','');
+const RES_OF=o=>getVal(o.cod.toLowerCase()+'.resultado','');
+reg({id:'capacidad',sec:'results',icon:'📈',es:'Resumen de niveles de capacidad',en:'Capability level summary',calc:1,
+ intro:T('Vista consolidada (solo lectura) de los niveles actuales y metas de los 40 objetivos. Se alimenta de cada formulario de objetivo.','Consolidated read-only view of current and target levels for the 40 objectives. It is fed from each objective form.'),
+ kpis:()=>{let e=0,gs=0,gn=0,gc=0;OBJ.forEach(o=>{const n=NIVEL_OF(o),m=META_OF(o);if(n!=='')e++;if(n!==''&&m!==''){gc++;const g=+m-+n;gs+=g;if(g>0)gn++}});
+   return [{l:t('k_eval'),v:e,s:t('k_of40')},{l:t('k_gapavg'),v:gc?(gs/gc).toFixed(1):'—'},{l:t('k_gapn'),v:gn,c:gn?'danger':'success'}]},
+ tables:[{key:'t',rows:OBJ,cols:[
+  {k:'cod',sv:i=>OBJ[i].cod,es:'Código',en:'Code',w:10},{k:'dom',sv:i=>OBJ[i].dom,es:'Dominio',en:'Domain',w:9},{k:'nom',sv:i=>L(OBJ[i]),es:'Objetivo',en:'Objective',w:46},
+  {k:'niv',sv:(i,fl)=>fl?disp({type:'number'},NIVEL_OF(OBJ[i])):'',es:'Nivel actual',en:'Current level',w:12},
+  {k:'meta',sv:(i,fl)=>fl?disp({type:'number'},META_OF(OBJ[i])):'',es:'Nivel meta',en:'Target level',w:12},
+  {k:'gap',sv:(i,fl)=>{if(!fl)return '';const n=NIVEL_OF(OBJ[i]),m=META_OF(OBJ[i]);return n!==''&&m!==''?+m-+n:''},es:'Brecha',en:'Gap',w:9},
+  {k:'res',sv:(i,fl)=>fl?disp({type:'select',opts:OPT_RES},RES_OF(OBJ[i])):'',es:'Resultado',en:'Result',w:16}]}]});
+
+reg({id:'hallazgos',sec:'results',icon:'🔍',es:'Cédula de hallazgos',en:'Findings register',
+ intro:T('Documente en detalle cada hallazgo: condición, criterio, causa y efecto.','Document each finding in detail: condition, criteria, cause and effect.'),
+ kpis:()=>{const f=FORMS.hallazgos,tb=f.tables[0];let n=0;for(let i=0;i<rowCount(f,tb);i++)if(String(getVal(cid(f,tb,i,'tit'),'')).trim())n++;return [{l:t('k_find'),v:n}]},
+ tables:[{key:'t',rows:8,addable:1,cols:[
+  {k:'id',sv:i=>'H-'+pad(i+1),es:'#',en:'#',w:8},{k:'proc',type:'select',opts:'OBJ',es:'Proceso COBIT',en:'COBIT process',w:12},{k:'tit',type:'text',es:'Título del hallazgo',en:'Finding title',w:30},
+  {k:'cond',type:'textarea',es:'Condición',en:'Condition',w:34},{k:'crit',type:'textarea',es:'Criterio',en:'Criteria',w:34},{k:'cau',type:'textarea',es:'Causa',en:'Cause',w:34},
+  {k:'efe',type:'textarea',es:'Efecto / impacto',en:'Effect / impact',w:34},{k:'resp',type:'text',es:'Responsable',en:'Owner',w:20}]}]});
+
+reg({id:'plan',sec:'results',icon:'✅',es:'Plan de acción / seguimiento',en:'Action plan / follow-up',
+ intro:T('Acciones correctivas acordadas con la entidad. Semáforo: 🟢 implementado · 🟡 en plazo · 🔴 vencido.','Corrective actions agreed with the entity. Traffic light: 🟢 implemented · 🟡 on time · 🔴 overdue.'),
+ kpis:()=>{const f=FORMS.plan,tb=f.tables[0];let n=0;for(let i=0;i<rowCount(f,tb);i++)if(String(getVal(cid(f,tb,i,'acc'),'')).trim())n++;return [{l:t('k_act'),v:n}]},
+ tables:[{key:'t',rows:8,addable:1,cols:[
+  {k:'n',sv:i=>pn(i),es:'#',en:'#',w:5},{k:'ref',type:'select',opts:Array.from({length:30},(_,j)=>({v:'H-'+pad(j+1),es:'H-'+pad(j+1),en:'H-'+pad(j+1)})),es:'Hallazgo ref.',en:'Finding ref.',w:13},
+  {k:'acc',type:'textarea',es:'Acción correctiva',en:'Corrective action',w:40},{k:'resp',type:'text',es:'Responsable',en:'Owner',w:20},{k:'fecha',type:'date',es:'Fecha compromiso',en:'Due date',w:14},
+  {k:'av',type:'number',min:0,max:100,es:'Avance %',en:'Progress %',w:10},
+  {k:'est',type:'select',opts:[{v:'pen',es:'Pendiente',en:'Pending'},{v:'pro',es:'En proceso',en:'In progress'},{v:'imp',es:'Implementado',en:'Implemented'},{v:'ver',es:'Verificado',en:'Verified'}],es:'Estado',en:'Status',w:14},
+  {k:'sem',calc:g=>{const e=g('est'),d=g('fecha');if(!e&&!d)return '';if(e==='imp'||e==='ver')return '🟢';if(d&&d<todayISO())return '🔴';return '🟡'},es:'Semáforo',en:'Light',w:10},
+  {k:'evi',type:'text',es:'Evidencia de cierre',en:'Closure evidence',w:26}]}]});
+
+function domStats(d){
+  const os=OBJ.filter(o=>o.dom===d);let ev=0,sn=0,sm=0,cm=0,c=0,p=0,nc=0;
+  os.forEach(o=>{const n=NIVEL_OF(o),m=META_OF(o),r=RES_OF(o);if(n!==''){ev++;sn+=+n}if(m!==''){cm++;sm+=+m}if(r==='cumple')c++;else if(r==='parcial')p++;else if(r==='nocumple')nc++});
+  return {n:os.length,ev,avg:ev?sn/ev:null,meta:cm?sm/cm:null,c,p,nc,sin:os.length-(c+p+nc),conf:Math.round((c+p*.5)/os.length*100)};
+}
+reg({id:'resumen',sec:'results',icon:'📊',es:'Resumen ejecutivo por dominio',en:'Executive summary by domain',calc:1,
+ intro:T('Panel calculado automáticamente a partir de las evaluaciones individuales.','Panel automatically calculated from the individual assessments.'),
+ kpis:()=>{let c=0,p=0,n=0,s=0;OBJ.forEach(o=>{const r=RES_OF(o);if(r==='cumple')c++;else if(r==='parcial')p++;else if(r==='nocumple')n++;else s++});
+   return [{l:t('k_cumple'),v:c,c:'success'},{l:t('k_parcial'),v:p,c:'warning'},{l:t('k_nocumple'),v:n,c:'danger'},{l:t('k_sineval'),v:s},{l:t('k_conf'),v:Math.round((c+p*.5)/40*100)+'%'}]},
+ tables:[{key:'t',rows:DOM_KEYS,cols:[
+  {k:'d',sv:i=>DOM_KEYS[i]+' — '+L(DOMS[DOM_KEYS[i]]),es:'Dominio',en:'Domain',w:44},{k:'n',sv:i=>domStats(DOM_KEYS[i]).n,es:'Objetivos',en:'Objectives',w:11},
+  {k:'ev',sv:(i,fl)=>fl?domStats(DOM_KEYS[i]).ev:'',es:'Evaluados',en:'Assessed',w:11},
+  {k:'avg',sv:(i,fl)=>{const s=fl?domStats(DOM_KEYS[i]).avg:null;return s===null?'':+s.toFixed(2)},es:'Nivel prom.',en:'Avg. level',w:11},
+  {k:'meta',sv:(i,fl)=>{const s=fl?domStats(DOM_KEYS[i]).meta:null;return s===null?'':+s.toFixed(2)},es:'Meta prom.',en:'Avg. target',w:11},
+  {k:'c',sv:(i,fl)=>fl?domStats(DOM_KEYS[i]).c:'',es:'Cumple',en:'Complies',w:9},{k:'p',sv:(i,fl)=>fl?domStats(DOM_KEYS[i]).p:'',es:'Parcial',en:'Partial',w:9},
+  {k:'nc',sv:(i,fl)=>fl?domStats(DOM_KEYS[i]).nc:'',es:'No cumple',en:'Does not comply',w:11},{k:'cf',sv:(i,fl)=>fl?domStats(DOM_KEYS[i]).conf+'%':'',es:'% Conformidad',en:'% Conformity',w:13}]}],
+ extra:()=>`<div class="card"><h2>🕸 ${lang==='es'?'Radar de capacidad por dominio':'Capability radar by domain'}</h2><div style="max-width:480px;margin:0 auto"><canvas id="radar" width="400" height="400"></canvas></div></div>`,
+ after:()=>{
+  if(typeof Chart==='undefined'){const c=$('#radar');if(c)c.parentNode.innerHTML='<p style="color:var(--muted);font-size:.85rem">Chart.js no disponible (sin conexión).</p>';return}
+  const cv=$('#radar');if(!cv)return;if(window._radar){try{window._radar.destroy()}catch(e){}}
+  const dk=document.documentElement.dataset.theme==='dark',tx=dk?'#e2e8f0':'#2c3e50',gr=dk?'rgba(255,255,255,.15)':'rgba(0,0,0,.1)',st=DOM_KEYS.map(domStats);
+  window._radar=new Chart(cv,{type:'radar',data:{labels:DOM_KEYS,datasets:[
+   {label:t('level'),data:st.map(s=>s.avg||0),backgroundColor:'rgba(41,128,185,.25)',borderColor:'rgba(41,128,185,.95)',borderWidth:2,pointBackgroundColor:'#2980b9'},
+   {label:t('target'),data:st.map(s=>s.meta||0),backgroundColor:'rgba(39,174,96,.1)',borderColor:'rgba(39,174,96,.8)',borderWidth:2,borderDash:[5,5],pointBackgroundColor:'#27ae60'}]},
+   options:{responsive:true,scales:{r:{min:0,max:5,ticks:{stepSize:1,color:tx,backdropColor:'transparent'},grid:{color:gr},angleLines:{color:gr},pointLabels:{color:tx,font:{size:13,weight:'bold'}}}},plugins:{legend:{position:'bottom',labels:{color:tx}}}}});
+ }});
+
+reg({id:'informe',sec:'results',icon:'📝',es:'Informe de auditoría',en:'Audit report',
+ intro:T('Informe ejecutivo con los resultados de la auditoría COBIT 2019.','Executive report with the COBIT 2019 audit results.'),
+ fields:[
+ {k:'opinion',type:'select',full:1,es:'Opinión del auditor',en:'Auditor opinion',opts:[
+  {v:'sin',es:'Sin salvedades — el sistema de gobierno y gestión de I&T es adecuado',en:'Unqualified — the I&T governance and management system is adequate'},
+  {v:'con',es:'Con salvedades — existen deficiencias que requieren atención',en:'Qualified — deficiencies exist that require attention'},
+  {v:'adv',es:'Adversa — el sistema presenta deficiencias significativas',en:'Adverse — the system has significant deficiencies'},
+  {v:'abs',es:'Abstención de opinión — alcance limitado',en:'Disclaimer of opinion — scope limitation'}]},
+ {k:'conclusiones',type:'textarea',full:1,rows:5,es:'Conclusiones generales',en:'General conclusions',ph:T('Resuma los hallazgos más relevantes…','Summarize the most relevant findings…')},
+ {k:'limitaciones',type:'textarea',full:1,es:'Limitaciones al alcance',en:'Scope limitations',ph:T('Indique limitaciones o restricciones al alcance…','State any scope limitations or restrictions…')},
+ {k:'recomendaciones',type:'textarea',full:1,rows:5,es:'Recomendaciones prioritarias',en:'Priority recommendations',ph:T('Liste las recomendaciones en orden de prioridad…','List recommendations in order of priority…')},
+ {k:'firma',type:'text',es:'Firma del auditor líder',en:'Lead auditor signature',ph:T('Nombre y firma','Name and signature')},
+ {k:'fecha',type:'date',es:'Fecha del informe',en:'Report date'}]});
+
+/* ---- Grupos, pasos y vistas ---- */
+const OBJ_IDS=d=>OBJ.filter(o=>o.dom===d).map(o=>o.cod.toLowerCase());
+const GROUPS={
+ prep:{es:'Preparación',en:'Preparation',forms:['portada','contexto','escalas','factores','alcance']},
+ papers:{es:'Papeles de trabajo',en:'Working papers',forms:['riesgos','evidencias','programa','muestreo']},
+ results:{es:'Resultados',en:'Results',forms:['capacidad','hallazgos','plan','resumen','informe']}};
+DOM_KEYS.forEach(d=>{GROUPS[d]={es:'Dominio '+d+' — '+DOMS[d].es,en:'Domain '+d+' — '+DOMS[d].en,forms:OBJ_IDS(d),color:DOMS[d].color}});
+const PACKS=['prep',...DOM_KEYS,'papers','results'];
+const SECS=[{id:'prep',k:'sec_prep'},{id:'eval',k:'sec_eval'},{id:'papers',k:'sec_papers'},{id:'results',k:'sec_results'},{id:'close',k:'sec_close'}];
+
+const STEPS=[];const STEP_MAP={};
+function addStep(s){STEPS.push(s);STEP_MAP[s.id]=s}
+GROUPS.prep.forms.forEach(id=>addStep(Object.assign(FORMS[id],{kind:'form'})));
+DOM_KEYS.forEach(d=>{
+  addStep({id:'dom_'+d,sec:'eval',kind:'dom',dom:d,color:DOMS[d].color,icon:DOMS[d].icon,es:d+' — '+DOMS[d].es,en:d+' — '+DOMS[d].en});
+  OBJ_IDS(d).forEach(id=>addStep(Object.assign(FORMS[id],{kind:'form'})));
+});
+[...GROUPS.papers.forms,...GROUPS.results.forms].forEach(id=>addStep(Object.assign(FORMS[id],{kind:'form'})));
+addStep({id:'revision',sec:'close',kind:'view',icon:'🏁',es:'Revisión final',en:'Final review'});
+addStep({id:'descargas',sec:'close',kind:'view',icon:'⬇️',es:'Centro de descargas',en:'Download center'});
+const ALL_FORM_IDS=[...GROUPS.prep.forms,...DOM_KEYS.flatMap(OBJ_IDS),...GROUPS.papers.forms,...GROUPS.results.forms];
+
+/* =====================================================================
+   ESTADO Y GUARDADO
+   ===================================================================== */
+const LS_KEY='cobit2019_v4';
+let STATE={},saveT=null,warned=false;
+function loadState(){
+  const raw=lsGet(LS_KEY);
+  if(raw){try{const d=JSON.parse(raw);if(d&&d.fields){STATE=d.fields;return}}catch(e){}}
+  migrateOld();
+}
+function migrateOld(){
+  const raw=lsGet('cobit2019_audit');if(!raw)return;
+  try{const d=JSON.parse(raw),S=(k,v)=>{if(v!==undefined&&v!==null&&v!=='')STATE[k]=v};
+   const P=d.portada||{};['entidad','area','periodo','auditor','equipo','fecha_ini','fecha_fin','objetivo'].forEach(k=>S('portada.'+k,P[k]));
+   const C=d.contexto||{};['mision','estrategia','estructura','procesos','regulatorio','historial'].forEach(k=>S('contexto.'+k,C[k]));
+   S('contexto.madurez',{Baja:'baja',Media:'media',Alta:'alta'}[C.madurez]);
+   const rm={'Cumple':'cumple','Parcial':'parcial','No cumple':'nocumple'};
+   Object.keys(d.objetivos||{}).forEach(c=>{const o=d.objetivos[c];['auditor','fecha','nivel','meta','evidencia','desc','hallazgo','recom'].forEach(k=>S(c+'.'+k,o[k]));S(c+'.resultado',rm[o.resultado])});
+   const I=d.informe||{};const om=s=>!s?'':s.startsWith('Sin')?'sin':s.startsWith('Con')?'con':s.startsWith('Adv')?'adv':'abs';
+   S('informe.opinion',om(I.opinion));['conclusiones','limitaciones','recomendaciones','firma','fecha'].forEach(k=>S('informe.'+k,I[k]));
+  }catch(e){}
+}
+function setInd(mode){
+  const el=$('#saveInd');if(!el)return;
+  if(mode==='saving')el.textContent='⏳ '+t('saving');
+  else if(mode==='warn')el.textContent='⚠️ '+t('nosave');
+  else el.textContent='💾 '+t('saved_at',{t:new Date().toLocaleTimeString(lang==='es'?'es-EC':'en-US',{hour:'2-digit',minute:'2-digit'})});
+}
+function scheduleSave(){setInd('saving');clearTimeout(saveT);saveT=setTimeout(saveNow,400)}
+function saveNow(){
+  clearTimeout(saveT);
+  const ok=lsSet(LS_KEY,JSON.stringify({v:4,ts:Date.now(),fields:STATE}));
+  setInd(ok?'saved':'warn');
+  if(!ok&&!warned){warned=true;toast(t('storage_warn'),'warning',8000)}
+  return ok;
+}
+window.addEventListener('beforeunload',()=>{if(saveT)saveNow()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&saveT)saveNow()});
+
+/* =====================================================================
+   ESTADÍSTICAS DE AVANCE
+   ===================================================================== */
+function buildIndex(){const ix={};Object.keys(STATE).forEach(k=>{if(k.endsWith('.__extra'))return;const v=STATE[k];if(v===''||v==null)return;ix[k.slice(0,k.indexOf('.'))]=true});return ix}
+let IDX={};
+function formStats(f){
+  let req=0,rf=0;
+  (f.fields||[]).forEach(fl=>{if(fl.req){req++;const v=STATE[fid(f,fl.k)];if(v!==undefined&&String(v).trim()!=='')rf++}});
+  const any=!!IDX[f.id];
+  const pct=req?Math.round(rf/req*100):(any?100:0);
+  return {req,rf,any,pct,state:pct>=100&&(req||any)?'done':any?'started':'empty'};
+}
+function globalProgress(){
+  const ids=['portada',...OBJ.map(o=>o.cod.toLowerCase())];
+  return Math.round(ids.reduce((s,id)=>s+formStats(FORMS[id]).pct,0)/ids.length);
+}
+
+/* =====================================================================
+   RENDER: CONTROLES
+   ===================================================================== */
+function ctl(c,id,v){
+  const a=`data-id="${id}" id="${id}"`;
+  if(c.type==='select')return `<select ${a}><option value="">—</option>${optsOf(c).map(o=>`<option value="${esc(o.v)}"${String(v)===String(o.v)?' selected':''}>${esc(L(o))}</option>`).join('')}</select>`;
+  if(c.type==='textarea')return `<textarea ${a} rows="${c.rows||3}" placeholder="${esc(L(c.ph))}">${esc(v)}</textarea>`;
+  if(c.type==='number')return `<input ${a} type="number" ${c.min!==undefined?`min="${c.min}"`:''} ${c.max!==undefined?`max="${c.max}"`:''} step="1" value="${esc(v)}" placeholder="${esc(L(c.ph))}">`;
+  return `<input ${a} type="${c.type==='date'?'date':'text'}" value="${esc(v)}" placeholder="${esc(L(c.ph))}">`;
+}
+function fieldHtml(f,fl){
+  const id=fid(f,fl.k);
+  if(fl.type==='static')return `<div class="fg${fl.full?' full':''}"><label>${esc(L(fl))}</label><div class="static">${esc(fl.sv())}</div></div>`;
+  const v=getVal(id,L(fl.def));
+  return `<div class="fg${fl.full?' full':''}"><label for="${id}">${esc(L(fl))}${fl.req?' <span class="rq">*</span>':''}</label>${ctl(fl,id,v)}${fl.hint?`<div class="hint" id="hint:${id}">${esc(fl.hint(v))}</div>`:''}</div>`;
+}
+function tableHtml(f,tb){
+  const n=rowCount(f,tb);
+  let h=tb.title?`<h3 class="tb-title">${esc(L(tb.title))}</h3>`:'';
+  h+=`<div class="table-wrapper"><table><thead><tr>${tb.cols.map(c=>`<th>${esc(L(c))}</th>`).join('')}</tr></thead><tbody>`;
+  for(let i=0;i<n;i++){
+    h+='<tr>'+tb.cols.map(c=>{
+      if(c.sv)return `<td>${esc(c.sv(i,true))}</td>`;
+      if(c.calc)return `<td id="calc:${cid(f,tb,i,c.k)}">${esc(c.calc(rowGetter(f,tb,i),i))}</td>`;
+      const id=cid(f,tb,i,c.k);return `<td>${ctl(c,id,getVal(id,c.def?c.def(i):''))}</td>`;
+    }).join('')+'</tr>';
+  }
+  h+='</tbody></table></div>';
+  if(tb.addable)h+=`<div style="margin-top:8px"><button class="btn btn-ghost btn-sm" data-do="addrow" data-f="${f.id}" data-t="${tb.key}">＋ ${esc(t('add_row'))}</button></div>`;
+  return h;
+}
+function kpiHtml(f){return f.kpis?f.kpis().map(k=>`<div class="kpi"><div class="label">${esc(k.l)}</div><div class="value ${k.c||''}">${esc(k.v)}</div>${k.s?`<div class="sub">${esc(k.s)}</div>`:''}</div>`).join(''):''}
+function exportMenu(scope){
+  return `<details class="menu"><summary class="btn btn-ghost btn-sm">${esc(t('menu_btn'))}</summary><div class="menu-list">
+   <button data-do="xlsx" data-scope="${scope}" data-filled="0">${esc(t('x_empty'))}</button>
+   <button data-do="xlsx" data-scope="${scope}" data-filled="1">${esc(t('x_filled'))}</button><hr>
+   <button data-do="print" data-scope="${scope}" data-filled="0">${esc(t('p_empty'))}</button>
+   <button data-do="print" data-scope="${scope}" data-filled="1">${esc(t('p_filled'))}</button></div></details>`;
+}
+const stLabel=s=>t(s==='done'?'st_done':s==='started'?'st_started':'st_empty');
+
+function formPage(f){
+  const st=formStats(f),hasReq=(f.fields||[]).some(x=>x.req);
+  let h=`<div class="page-head" style="--dc:${f.color||'var(--primary)'}"><div><h1>${f.icon} ${esc(L(f))}</h1><p>${esc(L(f.intro))}</p></div>
+   <div class="ph-actions"><span class="chip ${st.state}" id="statusChip">${esc(stLabel(st.state))}</span>
+   ${hasReq?`<button class="btn btn-ghost btn-sm" data-do="validate">✔ ${esc(t('validate'))}</button>`:''}${exportMenu('form:'+f.id)}</div></div>`;
+  if(f.kpis)h+=`<div class="kpi-grid" id="kpis">${kpiHtml(f)}</div>`;
+  if(f.extra&&f.id==='portada')h+=f.extra();
+  if(f.fields&&f.fields.length)h+=`<div class="card"><div class="form-grid">${f.fields.map(x=>fieldHtml(f,x)).join('')}</div>${hasReq?`<p class="hint" style="margin-top:10px">${esc(t('req_note'))}</p>`:''}</div>`;
+  (f.tables||[]).forEach(tb=>{h+=`<div class="card">${tableHtml(f,tb)}</div>`});
+  if(f.extra&&f.id!=='portada')h+=f.extra();
+  return h;
+}
+function domPage(d){
+  const D=DOMS[d],os=OBJ.filter(o=>o.dom===d);
+  let done=0,sn=0,cn=0,pc=0;
+  os.forEach(o=>{const s=formStats(FORMS[o.cod.toLowerCase()]);if(s.state==='done')done++;pc+=s.pct;const n=NIVEL_OF(o);if(n!==''){sn+=+n;cn++}});
+  let h=`<div class="page-head" style="--dc:${D.color}"><div><h1>${D.icon} ${d} — ${esc(L(D))}</h1><p>${esc(lang==='es'?D.des:D.den)}</p></div><div class="ph-actions">${exportMenu('group:'+d)}</div></div>
+   <div class="kpi-grid" id="kpis"><div class="kpi"><div class="label">${esc(t('dom_done'))}</div><div class="value">${done}/${os.length}</div></div>
+   <div class="kpi"><div class="label">${esc(t('dom_avg'))}</div><div class="value">${cn?(sn/cn).toFixed(1):'—'}</div></div>
+   <div class="kpi"><div class="label">${esc(t('dom_prog'))}</div><div class="value">${Math.round(pc/os.length)}%</div></div></div><div class="ocards">`;
+  os.forEach(o=>{
+    const f=FORMS[o.cod.toLowerCase()],s=formStats(f),n=NIVEL_OF(o),r=RES_OF(o);
+    h+=`<div class="ocard" style="--dc:${D.color}"><div style="display:flex;justify-content:space-between"><span class="cod">${o.cod}</span><span class="chip ${s.state}">${esc(stLabel(s.state))}</span></div>
+     <div class="nm">${esc(L(o))}</div><div class="meta">${esc(t('level'))}: ${n!==''?n:'—'} · ${esc(t('target'))}: ${META_OF(o)!==''?META_OF(o):'—'} · ${r?esc(disp({type:'select',opts:OPT_RES},r)):esc(t('not_eval'))}</div>
+     <div class="mini"><i style="width:${s.pct}%"></i></div><button class="btn btn-primary btn-sm" data-go="${f.id}">${esc(t('open_form'))} →</button></div>`;
+  });
+  return h+'</div>';
+}
+function pendingList(){
+  const out=[];
+  FORMS.portada.fields.filter(x=>x.req).forEach(x=>{if(!String(getVal(fid(FORMS.portada,x.k),'')).trim())out.push({go:'portada',label:L(FORMS.portada)+' → '+L(x)})});
+  OBJ.forEach(o=>{const id=o.cod.toLowerCase(),m=[];if(getVal(id+'.nivel','')==='')m.push(lang==='es'?'nivel':'level');if(getVal(id+'.resultado','')==='')m.push(lang==='es'?'resultado':'result');
+    if(m.length)out.push({go:id,label:o.cod+' ('+m.join(', ')+')'})});
+  return out;
+}
+function revisionPage(){
+  const pend=pendingList(),P=FORMS.portada,I=FORMS.informe;
+  const kv=(f,ks)=>`<table><tbody>${ks.map(k=>{const fl=f.fields.find(x=>x.k===k);return `<tr><th style="width:30%">${esc(L(fl))}</th><td>${esc(disp(fl,getVal(fid(f,k),L(fl.def))))||'<i style="color:var(--muted)">—</i>'}</td></tr>`}).join('')}</tbody></table>`;
+  let h=`<div class="page-head"><div><h1>🏁 ${esc(t('rev_title'))}</h1><p>${esc(t('rev_intro'))}</p></div><div class="ph-actions">${exportMenu('all')}</div></div>
+   <div class="card pend"><h2>${esc(t('rev_pend'))} (${pend.length})</h2>${pend.length?pend.map(p=>`<button class="btn btn-ghost btn-sm" data-go="${p.go}">${esc(p.label)}</button>`).join(''):`<p>✅ ${esc(t('rev_ok'))}</p>`}</div>
+   <div class="card"><h2>${esc(t('rev_general'))}</h2><div class="table-wrapper">${kv(P,['entidad','area','periodo','auditor','equipo'])}</div><div class="table-wrapper" style="margin-top:8px">${kv(I,['opinion','firma','fecha'])}</div></div>
+   <div class="card"><h2>${esc(t('rev_obj'))}</h2>`;
+  DOM_KEYS.forEach(d=>{
+    h+=`<h3 class="tb-title" style="color:${DOMS[d].color}">${DOMS[d].icon} ${d} — ${esc(L(DOMS[d]))}</h3><div class="table-wrapper"><table><thead><tr><th></th><th>${esc(L({es:'Código',en:'Code'}))}</th><th>${esc(L({es:'Objetivo',en:'Objective'}))}</th><th>${esc(t('level'))}/${esc(t('target'))}</th><th>${esc(t('result'))}</th></tr></thead><tbody>`;
+    OBJ.filter(o=>o.dom===d).forEach(o=>{const f=FORMS[o.cod.toLowerCase()],s=formStats(f);
+      h+=`<tr style="cursor:pointer" data-go="${f.id}"><td><span class="dot ${s.state}"></span></td><td><b>${o.cod}</b></td><td>${esc(L(o))}</td><td>${NIVEL_OF(o)!==''?NIVEL_OF(o):'—'} / ${META_OF(o)!==''?META_OF(o):'—'}</td><td>${esc(disp({type:'select',opts:OPT_RES},RES_OF(o)))||'—'}</td></tr>`});
+    h+='</tbody></table></div>';
+  });
+  return h+'</div>';
+}
+function downloadsPage(){
+  const btns=(scope)=>`<div class="row"><button class="btn btn-ghost btn-sm" data-do="xlsx" data-scope="${scope}" data-filled="0">⬇ ${esc(t('dl_xlsx'))} · ${esc(t('dl_blank'))}</button>
+   <button class="btn btn-success btn-sm" data-do="xlsx" data-scope="${scope}" data-filled="1">⬇ ${esc(t('dl_xlsx'))} · ${esc(t('dl_filled'))}</button>
+   <button class="btn btn-ghost btn-sm" data-do="print" data-scope="${scope}" data-filled="0">🖨 ${esc(t('dl_blank'))}</button>
+   <button class="btn btn-ghost btn-sm" data-do="print" data-scope="${scope}" data-filled="1">🖨 ${esc(t('dl_filled'))}</button></div>`;
+  let h=`<div class="page-head"><div><h1>⬇️ ${esc(t('dl_title'))}</h1><p>${esc(t('dl_intro'))}</p></div></div>
+   <div class="card"><h2>📦 ${esc(t('dl_packs'))}</h2><div class="dl-grid">
+   <div class="pack" style="--dc:var(--accent)"><h4>🗂 ${esc(t('dl_all'))}</h4><small>${esc(t('dl_n',{n:ALL_FORM_IDS.length}))}</small>${btns('all')}</div>`;
+  PACKS.forEach(g=>{const G=GROUPS[g];h+=`<div class="pack" style="--dc:${G.color||'var(--primary)'}"><h4>${esc(L(G))}</h4><small>${esc(t('dl_n',{n:G.forms.length}))}</small>${btns('group:'+g)}</div>`});
+  h+=`</div></div><div class="card"><h2>📄 ${esc(t('dl_forms'))}</h2>`;
+  const section=(title,ids,color)=>{
+    let s=`<h3 class="tb-title"${color?` style="color:${color}"`:''}>${esc(title)}</h3><div class="table-wrapper"><table><thead><tr><th></th><th>${esc(t('col_form'))}</th><th>${esc(t('col_status'))}</th><th></th></tr></thead><tbody>`;
+    ids.forEach(id=>{const f=FORMS[id],st=formStats(f);
+      s+=`<tr><td><span class="dot ${st.state}"></span></td><td><a href="#" data-go="${id}" style="color:var(--primary);text-decoration:none">${f.icon} ${esc(L(f))}</a></td><td>${esc(stLabel(st.state))}</td>
+       <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" data-do="xlsx" data-scope="form:${id}" data-filled="0" title="${esc(t('x_empty'))}">⬇ ${esc(t('dl_blank'))}</button>
+       <button class="btn btn-success btn-sm" data-do="xlsx" data-scope="form:${id}" data-filled="1" title="${esc(t('x_filled'))}">⬇ ${esc(t('dl_filled'))}</button>
+       <button class="btn btn-ghost btn-sm" data-do="print" data-scope="form:${id}" data-filled="0" title="${esc(t('p_empty'))}">🖨</button>
+       <button class="btn btn-ghost btn-sm" data-do="print" data-scope="form:${id}" data-filled="1" title="${esc(t('p_filled'))}">🖨✎</button></td></tr>`});
+    return s+'</tbody></table></div>';
+  };
+  h+=section(L(GROUPS.prep),GROUPS.prep.forms);
+  DOM_KEYS.forEach(d=>{h+=section(L(GROUPS[d]),GROUPS[d].forms,DOMS[d].color)});
+  h+=section(L(GROUPS.papers),GROUPS.papers.forms)+section(L(GROUPS.results),GROUPS.results.forms)+'</div>';
+  h+=`<div class="card"><h2>🛡 ${esc(t('dl_backup'))}</h2><p style="font-size:.85rem;color:var(--muted);margin-bottom:10px">${esc(t('dl_backup_txt'))}</p>
+   <button class="btn btn-ghost" data-do="bk_export">⬆ ${esc(t('bk_export'))}</button> <button class="btn btn-ghost" data-do="bk_import">⬇ ${esc(t('bk_import'))}</button></div>`;
+  return h;
+}
+
+/* =====================================================================
+   RENDER: SIDEBAR, PÁGINA, CHROME
+   ===================================================================== */
+let current='portada';const UIS={open:{}};
+const stepTitle=s=>L(s);
+function renderSidebar(){
+  const sb=$('#sidebar'),top=sb.scrollTop;let h='';
+  SECS.forEach(sec=>{
+    const items=STEPS.filter(s=>s.sec===sec.id),isOpen=UIS.open[sec.id]!==false;
+    h+=`<button class="sec-btn" data-do="sec" data-sec="${sec.id}"><span>${esc(t(sec.k))}</span><span>${isOpen?'▾':'▸'}</span></button>`;
+    if(!isOpen)return;
+    items.forEach(s=>{
+      if(s.kind==='form'&&s.sec==='eval')return;
+      if(s.kind==='dom'){
+        const d=s.dom;h+=`<button class="sitem dom${current===s.id?' active':''}" style="--dc:${DOMS[d].color}" data-go="${s.id}" id="si-${s.id}"><span>${s.icon}</span><span class="t">${d} — ${esc(L(DOMS[d]))}</span><span class="cnt" data-domcount="${d}"></span></button>
+         <div class="chips">${OBJ_IDS(d).map(id=>`<button class="ochip${current===id?' active':''}" data-go="${id}" id="si-${id}" title="${esc(L(FORMS[id]))}">${id.toUpperCase()}<i class="dot" data-dot="${id}"></i></button>`).join('')}</div>`;
+      }else{
+        h+=`<button class="sitem${current===s.id?' active':''}" data-go="${s.id}" id="si-${s.id}"><span>${s.icon}</span><span class="t">${esc(stepTitle(s))}</span>${s.kind==='form'?`<i class="dot" data-dot="${s.id}"></i>`:''}</button>`;
+      }
+    });
+  });
+  sb.innerHTML=h;sb.scrollTop=top;
+  const a=$('#si-'+current);if(a&&a.scrollIntoView)try{a.scrollIntoView({block:'nearest'})}catch(e){}
+}
+function updateChrome(){
+  IDX=buildIndex();
+  $$('[data-dot]').forEach(el=>{const f=FORMS[el.dataset.dot];if(!f)return;const c=el.classList.contains('dot')?'dot ':'';el.className='dot '+formStats(f).state});
+  DOM_KEYS.forEach(d=>{const el=$('[data-domcount="'+d+'"]');if(el){const n=OBJ_IDS(d).filter(id=>formStats(FORMS[id]).state==='done').length;el.textContent=n+'/'+OBJ_IDS(d).length}});
+  const p=globalProgress();$('#progFill').style.width=p+'%';$('#progPct').textContent=p+'%';$('#progTrack').setAttribute('aria-valuenow',p);
+  const s=STEP_MAP[current];if(s&&s.kind==='form'){const chip=$('#statusChip');if(chip){const st=formStats(s).state;chip.className='chip '+st;chip.textContent=stLabel(st)}}
+}
+function renderBottom(){
+  const i=STEPS.findIndex(s=>s.id===current),pv=STEPS[i-1],nx=STEPS[i+1];
+  $('#btnPrev').disabled=!pv;$('#btnNext').disabled=!nx;
+  $('#btnPrev .tt').textContent=pv?t('prev')+': '+stepTitle(pv).slice(0,34):t('prev');
+  $('#btnNext .tt').textContent=nx?t('next')+': '+stepTitle(nx).slice(0,34):t('next');
+  $('#barMid').textContent=t('step_of',{a:i+1,b:STEPS.length});
+  $('#stepN').textContent=t('step_of',{a:i+1,b:STEPS.length});
+  const sec=SECS.find(x=>x.id===STEP_MAP[current].sec);
+  $('#crumb').innerHTML='🏠 '+esc(t(sec.k))+' › <b>'+esc(stepTitle(STEP_MAP[current]))+'</b>';
+}
+function render(){
+  const s=STEP_MAP[current],page=$('#page');IDX=buildIndex();
+  if(s.kind==='form')page.innerHTML=formPage(s);
+  else if(s.kind==='dom')page.innerHTML=domPage(s.dom);
+  else if(s.id==='revision')page.innerHTML=revisionPage();
+  else page.innerHTML=downloadsPage();
+  if(s.after)s.after();
+  renderSidebar();updateChrome();renderBottom();
+}
+function go(id,keep){
+  if(!STEP_MAP[id])return;
+  if(saveT)saveNow();
+  current=id;lsSet('cobit_step',id);
+  try{history.replaceState(null,'','#'+id)}catch(e){}
+  document.body.classList.remove('side-open');
+  render();
+  if(!keep)window.scrollTo({top:0});
+}
+const goRel=d=>{const i=STEPS.findIndex(s=>s.id===current),n=STEPS[i+d];if(n)go(n.id)};
+
+/* ---- edición (delegada) ---- */
+function onEdit(e){
+  const el=e.target,id=el&&el.dataset&&el.dataset.id;if(!id)return;
+  const f=STEP_MAP[current];if(!f||f.kind!=='form')return;
+  const v=el.value;
+  const parts=id.split('.');let hasDef=false;
+  if(parts.length===2){const fl=(f.fields||[]).find(x=>x.k===parts[1]);hasDef=!!(fl&&fl.def)}
+  else{const tb=(f.tables||[]).find(x=>x.key===parts[1]),c=tb&&tb.cols.find(x=>x.k===parts[3]);hasDef=!!(c&&c.def)}
+  if(v===''&&!hasDef)delete STATE[id];else STATE[id]=v;
+  el.classList.remove('invalid');
+  scheduleSave();refreshPage(f);
+}
+function refreshPage(f){
+  IDX=buildIndex();
+  (f.tables||[]).forEach(tb=>{const n=rowCount(f,tb);tb.cols.filter(c=>c.calc).forEach(c=>{for(let i=0;i<n;i++){const el=document.getElementById('calc:'+cid(f,tb,i,c.k));if(el)el.textContent=c.calc(rowGetter(f,tb,i),i)}})});
+  (f.fields||[]).forEach(fl=>{if(fl.hint){const el=document.getElementById('hint:'+fid(f,fl.k));if(el)el.textContent=fl.hint(getVal(fid(f,fl.k),''))}});
+  const kp=$('#kpis');if(kp&&f.kpis)kp.innerHTML=kpiHtml(f);
+  updateChrome();
+}
+function validateForm(){
+  const f=STEP_MAP[current];if(!f||f.kind!=='form')return;let bad=0;
+  (f.fields||[]).filter(x=>x.req).forEach(fl=>{const el=document.getElementById(fid(f,fl.k)),ok=String(getVal(fid(f,fl.k),'')).trim()!=='';if(el){el.classList.toggle('invalid',!ok)}if(!ok)bad++});
+  toast(bad?t('val_bad'):t('val_ok'),bad?'warning':'success');
+}
+
+/* =====================================================================
+   DESCRIPCIÓN NEUTRA DE UN FORMULARIO (la usan Excel e impresión)
+   ===================================================================== */
+function scopeForms(scope){
+  if(scope==='current'){const s=STEP_MAP[current];scope=s.kind==='form'?'form:'+s.id:s.kind==='dom'?'group:'+s.dom:'all'}
+  if(scope==='all')return ALL_FORM_IDS.map(id=>FORMS[id]);
+  if(scope.startsWith('form:'))return [FORMS[scope.slice(5)]];
+  if(scope.startsWith('group:'))return GROUPS[scope.slice(6)].forms.map(id=>FORMS[id]);
+  return [];
+}
+function scopeObjs(scope){
+  if(scope==='current'){const s=STEP_MAP[current];scope=s.kind==='form'?'form:'+s.id:s.kind==='dom'?'group:'+s.dom:'all'}
+  if(scope==='all')return OBJ;
+  if(scope.startsWith('group:')&&DOMS[scope.slice(6)])return OBJ.filter(o=>o.dom===scope.slice(6));
+  return null;
+}
+function resolveScope(scope){if(scope==='current'){const s=STEP_MAP[current];return s.kind==='form'?'form:'+s.id:s.kind==='dom'?'group:'+s.dom:'all'}return scope}
+function describeForm(f,filled){
+  const d={title:L(f),intro:L(f.intro),color:f.color,fields:[],tables:[]};
+  (f.fields||[]).forEach(fl=>{
+    let val='';
+    if(fl.type==='static')val=fl.sv();else{const dv=L(fl.def);val=disp(fl,filled?getVal(fid(f,fl.k),dv):dv)}
+    d.fields.push({label:L(fl),req:!!fl.req,value:val,list:fl.type==='select'?optsOf(fl).map(L):null,tall:fl.type==='textarea',type:fl.type});
+  });
+  (f.tables||[]).forEach(tb=>{
+    const n=rowCount(f,tb,filled),rows=[];
+    for(let i=0;i<n;i++)rows.push(tb.cols.map(c=>{
+      if(c.sv)return c.sv(i,filled);
+      if(c.calc)return filled?c.calc(rowGetter(f,tb,i),i):'';
+      const dv=c.def?c.def(i):'';return disp(c,filled?getVal(cid(f,tb,i,c.k),dv):dv);
+    }));
+    d.tables.push({title:tb.title?L(tb.title):'',headers:tb.cols.map(L),cols:tb.cols.map(c=>({w:c.w||16,type:c.type,list:c.type==='select'?optsOf(c).map(L):null})),rows});
+  });
+  return d;
+}
+function describeSummary(objs,filled){
+  const hd=lang==='es'?['Código','Dominio','Objetivo','Auditor','Fecha','Nivel actual','Nivel meta','Brecha','Resultado','Ref. evidencia','Descripción','Hallazgos','Recomendación']:['Code','Domain','Objective','Auditor','Date','Current level','Target level','Gap','Result','Evidence ref.','Description','Findings','Recommendation'];
+  const rows=objs.map(o=>{const c=o.cod.toLowerCase(),g=k=>filled?getVal(c+'.'+k,''):'';const n=g('nivel'),m=g('meta');
+    return [o.cod,o.dom,L(o),g('auditor'),g('fecha'),n!==''?+n:'',m!==''?+m:'',(n!==''&&m!=='')?+m-+n:'',filled?disp({type:'select',opts:OPT_RES},g('resultado')):'',g('evidencia'),g('desc'),g('hallazgo'),g('recom')]});
+  return {title:lang==='es'?'Resumen de objetivos COBIT 2019':'COBIT 2019 objectives summary',intro:'',fields:[],tables:[{title:'',headers:hd,cols:[10,9,44,18,12,12,12,9,14,14,34,34,34].map(w=>({w})),rows}],freeze:true};
+}
+
+/* =====================================================================
+   EXCEL (ExcelJS)
+   ===================================================================== */
+const XL={titleBg:{argb:'FF1A5276'},headerBg:{argb:'FF2980B9'},band:{argb:'FFEAF2F8'},white:{argb:'FFFFFFFF'},lab:{argb:'FFE3ECF4'},line:{style:'thin',color:{argb:'FFB0BEC5'}}};
+const xb=()=>({top:XL.line,left:XL.line,bottom:XL.line,right:XL.line});
+const solid=c=>({type:'pattern',pattern:'solid',fgColor:c});
+function listRef(wb,ctx,labels){
+  const key=labels.join('\u0001');if(ctx.lists[key])return ctx.lists[key];
+  if(!ctx.ls){ctx.ls=wb.addWorksheet('Listas',{state:'hidden'});ctx.nc=1}
+  const col=ctx.nc++;labels.forEach((v,i)=>{ctx.ls.getCell(i+1,col).value=v});
+  const L_=ctx.ls.getColumn(col).letter,ref="Listas!$"+L_+"$1:$"+L_+"$"+labels.length;ctx.lists[key]=ref;return ref;
+}
+function uniqName(ctx,raw){
+  let base=String(raw).replace(/[\\\/\?\*\[\]:]/g,' ').replace(/\s+/g,' ').trim().slice(0,31)||'Hoja',n=base,i=2;
+  while(ctx.names.has(n.toLowerCase())||n.toLowerCase()==='listas'){const s=' ('+i++ +')';n=base.slice(0,31-s.length)+s}
+  ctx.names.add(n.toLowerCase());return n;
+}
+function writeSheet(wb,ctx,name,d,color){
+  const ws=wb.addWorksheet(uniqName(ctx,name),{properties:color?{tabColor:{argb:'FF'+color.replace('#','').toUpperCase()}}:{}});
+  const tcols=d.tables.reduce((m,x)=>Math.max(m,x.headers.length),0),ncol=Math.max(d.fields.length?3:1,tcols);
+  const w=[];for(let j=0;j<ncol;j++){let m=14;d.tables.forEach(tb=>{if(tb.cols[j])m=Math.max(m,tb.cols[j].w||14)});w.push(m)}
+  if(d.fields.length)w[0]=Math.max(w[0],32);
+  w.forEach((x,i)=>{ws.getColumn(i+1).width=x});
+  let r=1;
+  if(ncol>1)ws.mergeCells(r,1,r,ncol);
+  const tc=ws.getCell(r,1);tc.value=d.title;tc.font={bold:true,size:14,color:{argb:'FFFFFFFF'}};tc.fill=solid(XL.titleBg);tc.alignment={horizontal:'left',vertical:'middle',indent:1};
+  for(let j=1;j<=ncol;j++)ws.getCell(r,j).border=xb();ws.getRow(r).height=28;r++;
+  if(d.intro){if(ncol>1)ws.mergeCells(r,1,r,ncol);const ic=ws.getCell(r,1);ic.value=d.intro;ic.font={italic:true,size:9,color:{argb:'FF566573'}};ic.alignment={wrapText:true,vertical:'middle'};ws.getRow(r).height=Math.max(18,15*Math.ceil(d.intro.length/(w.reduce((a,b)=>a+b,0)*1.05)));r++}
+  r++;
+  const vw=w.slice(1).reduce((a,b)=>a+b,0)||40;
+  d.fields.forEach(fl=>{
+    const lc=ws.getCell(r,1);lc.value=fl.label+(fl.req?' *':'');lc.font={bold:true,size:10};lc.fill=solid(XL.lab);lc.border=xb();lc.alignment={vertical:'middle',wrapText:true};
+    if(ncol>2)ws.mergeCells(r,2,r,ncol);
+    const vc=ws.getCell(r,2);vc.value=(fl.type==='number'&&fl.value!==''&&isFinite(Number(fl.value)))?Number(fl.value):fl.value;vc.font={size:10};vc.alignment={vertical:fl.tall?'top':'middle',wrapText:true};
+    for(let j=2;j<=ncol;j++)ws.getCell(r,j).border=xb();
+    if(fl.list)vc.dataValidation={type:'list',allowBlank:true,formulae:[listRef(wb,ctx,fl.list)],showErrorMessage:true,errorTitle:'—',error:fl.list.join(' / ').slice(0,200)};
+    ws.getRow(r).height=fl.tall?Math.max(48,Math.min(220,15*Math.ceil(((String(fl.value).length)||1)/(vw*1.0))+8)):22;
+    r++;
+  });
+  if(d.fields.length)r++;
+  let hdrRow=0,lastRow=0;
+  d.tables.forEach(tb=>{
+    if(tb.title){if(ncol>1)ws.mergeCells(r,1,r,ncol);const c=ws.getCell(r,1);c.value=tb.title;c.font={bold:true,size:11,color:{argb:'FF1A5276'}};r++}
+    const hr=ws.getRow(r);tb.headers.forEach((h,i)=>{const c=hr.getCell(i+1);c.value=h;c.font={bold:true,size:10,color:{argb:'FFFFFFFF'}};c.fill=solid(XL.headerBg);c.border=xb();c.alignment={horizontal:'center',vertical:'middle',wrapText:true}});
+    hr.height=30;if(!hdrRow)hdrRow=r;r++;const first=r;
+    tb.rows.forEach((row,ri)=>{
+      const rr=ws.getRow(r);
+      row.forEach((v,ci)=>{
+        const c=rr.getCell(ci+1),cd=tb.cols[ci]||{};
+        c.value=(cd.type==='number'&&v!==''&&isFinite(Number(v)))?Number(v):v;
+        c.border=xb();c.font={size:10};c.fill=solid(ri%2?XL.band:XL.white);
+        c.alignment={vertical:'middle',wrapText:true,horizontal:typeof c.value==='number'?'center':'left'};
+        if(cd.list)c.dataValidation={type:'list',allowBlank:true,formulae:[listRef(wb,ctx,cd.list)],showErrorMessage:true,errorTitle:'—',error:cd.list.slice(0,12).join(' / ').slice(0,200)};
+      });
+      const longest=row.reduce((m,v,ci)=>Math.max(m,Math.ceil(String(v==null?'':v).length/Math.max(8,(tb.cols[ci]&&tb.cols[ci].w||14)*1.05))),1);
+      rr.height=Math.max(20,Math.min(150,15*longest+4));r++;
+    });
+    lastRow=r-1;
+    if(d.tables.length===1&&tb.rows.length&&!d.fields.length)ws.autoFilter={from:{row:first-1,column:1},to:{row:lastRow,column:tb.headers.length}};
+    r++;
+  });
+  if(d.tables.length===1&&!d.fields.length&&hdrRow)ws.views=[{state:'frozen',ySplit:hdrRow}];
+  ws.pageSetup={orientation:ncol>5?'landscape':'portrait',fitToPage:true,fitToWidth:1,fitToHeight:0,paperSize:9};
+  return ws;
+}
+function buildWorkbook(scope,filled){
+  scope=resolveScope(scope);
+  const wb=new ExcelJS.Workbook();wb.creator='GRUPO 3 · COBIT 2019';wb.created=new Date();
+  const ctx={names:new Set(),lists:{},ls:null,nc:1},os=scopeObjs(scope);
+  if(os)writeSheet(wb,ctx,lang==='es'?'Resumen_Objetivos':'Objectives_Summary',describeSummary(os,filled),scope.startsWith('group:')?DOMS[scope.slice(6)].color:'#1a5276');
+  scopeForms(scope).forEach(f=>writeSheet(wb,ctx,f.code||L(f),describeForm(f,filled),f.color));
+  return wb;
+}
+function fileName(scope,filled){
+  scope=resolveScope(scope);
+  const sfx=lang==='es'?(filled?'Lleno':'Vacio'):(filled?'Filled':'Blank');
+  const nm=scope==='all'?(lang==='es'?'Todo':'All'):scope.startsWith('form:')?scope.slice(5).toUpperCase():scope.slice(6);
+  return 'COBIT2019_'+nm+'_'+sfx+'.xlsx';
+}
+async function xlDownload(wb,filename){
+  const buf=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  dlBlob(blob,filename);
+}
+function dlBlob(blob,filename){
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1500);
+}
+async function exportXlsx(scope,filled){
+  if(typeof ExcelJS==='undefined'){toast(t('xl_missing'),'error',7000);return}
+  try{const wb=buildWorkbook(scope,filled),name=fileName(scope,filled);await xlDownload(wb,name);toast('⬇ '+t('xl_ok')+': '+name,'success')}
+  catch(e){console.error(e);toast(t('xl_err')+' '+e.message,'error',7000)}
+}
+
+/* =====================================================================
+   IMPRESIÓN (usa los datos guardados)
+   ===================================================================== */
+function buildPrint(scope,filled){
+  scope=resolveScope(scope);
+  const forms=scopeForms(scope),os=scopeObjs(scope),P=FORMS.portada,g=k=>String(getVal(fid(P,k),'')).trim();
+  const scopeName=scope==='all'?(lang==='es'?'Todo el trabajo de auditoría':'Whole audit work'):scope.startsWith('form:')?L(FORMS[scope.slice(5)]):L(GROUPS[scope.slice(6)]);
+  let h=`<div class="pcover"><h1>${esc(t('app_title'))}</h1><div class="mode">${esc(t(filled?'mode_filled':'mode_blank'))}</div><p><b>${esc(t('scope_lbl'))}:</b> ${esc(scopeName)}</p>`;
+  if(filled&&g('entidad'))h+=`<p><b>${esc(t('entity'))}:</b> ${esc(g('entidad'))}</p>`;
+  if(filled&&g('periodo'))h+=`<p><b>${esc(L(P.fields[2]))}:</b> ${esc(g('periodo'))}</p>`;
+  if(filled&&g('auditor'))h+=`<p><b>${esc(L(P.fields[3]))}:</b> ${esc(g('auditor'))}</p>`;
+  h+=`<p>${esc(t('generated'))}: ${esc(new Date().toLocaleString(lang==='es'?'es-EC':'en-US'))}</p><p style="margin-top:8mm"><b>${esc(t('team'))}</b></p><ul>${MEMBERS.map(m=>`<li>${esc(m[0])}</li>`).join('')}</ul></div>`;
+  const sec=d=>{
+    let s=`<section class="pf"><h2>${esc(d.title)}</h2>`;if(d.intro)s+=`<p class="pi">${esc(d.intro)}</p>`;
+    if(d.fields.length)s+='<table class="pt kv"><tbody>'+d.fields.map(f=>`<tr><th>${esc(f.label)}${f.req?' *':''}</th><td class="${f.tall?'tall':''}">${esc(f.value)||'&nbsp;'}</td></tr>`).join('')+'</tbody></table>';
+    d.tables.forEach(tb=>{s+=(tb.title?`<h3>${esc(tb.title)}</h3>`:'')+`<table class="pt grid"><thead><tr>${tb.headers.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${tb.rows.map(r=>`<tr>${r.map(v=>`<td>${esc(v)||'&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody></table>`});
+    return s+'</section>';
+  };
+  if(os)h+=sec(describeSummary(os,filled));
+  forms.forEach(f=>{h+=sec(describeForm(f,filled))});
+  return h;
+}
+function doPrint(scope,filled){
+  if(saveT)saveNow();
+  $('#printRoot').innerHTML=buildPrint(scope,filled);
+  setTimeout(()=>window.print(),80);
+}
+window.addEventListener('beforeprint',()=>{const r=$('#printRoot');if(r&&!r.innerHTML.trim())r.innerHTML=buildPrint('current',true)});
+window.addEventListener('afterprint',()=>{const r=$('#printRoot');if(r)r.innerHTML=''});
+
+/* =====================================================================
+   TOAST, MODAL, COPIA DE SEGURIDAD
+   ===================================================================== */
+function toast(msg,type='info',ms=3200){
+  const c=$('#toasts'),el=document.createElement('div');el.className='toast '+type;el.textContent=msg;c.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),350)},ms);
+}
+function confirmBox(msg,onOk){
+  const bg=document.createElement('div');bg.className='modal-bg';
+  bg.innerHTML=`<div class="modal" role="dialog"><p>${esc(msg)}</p><div class="row"><button class="btn btn-ghost" data-c="0">${esc(t('conf_cancel'))}</button><button class="btn btn-danger" data-c="1">${esc(t('conf_ok'))}</button></div></div>`;
+  bg.addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(b){bg.remove();if(b.dataset.c==='1')onOk()}else if(e.target===bg)bg.remove()});
+  document.body.appendChild(bg);
+}
+function exportBackup(){
+  saveNow();
+  dlBlob(new Blob([JSON.stringify({app:'cobit2019-grupo3',version:4,exported:new Date().toISOString(),fields:STATE},null,1)],{type:'application/json'}),'COBIT2019_copia_'+todayISO()+'.json');
+}
+function importBackup(file){
+  const rd=new FileReader();
+  rd.onload=()=>{try{const d=JSON.parse(rd.result);if(!d||d.app!=='cobit2019-grupo3'||typeof d.fields!=='object')throw 0;STATE=d.fields;saveNow();render();toast(t('imported'),'success')}catch(e){toast(t('import_err'),'error')}};
+  rd.readAsText(file);
+}
+
+/* =====================================================================
+   TOUR GUIADO (spotlight)
+   ===================================================================== */
+const TOUR_SEL=[null,'#sidebar','#page','#bottomBar','#btnSave','#btnDownloads','#btnPrint','#btnLang'];
+let tourI=-1;
+function tourStart(){tourClose(true);go('portada');tourI=0;
+  const lay=document.createElement('div');lay.id='tourLayer';lay.innerHTML='<div id="tourSpot"></div><div id="tourCard" role="dialog" aria-live="polite"></div>';
+  document.body.appendChild(lay);window.addEventListener('resize',tourPlace);document.addEventListener('keydown',tourKey,true);tourShow(0)}
+function tourKey(e){if(e.key==='Escape'){e.preventDefault();tourClose()}else if(e.key==='ArrowRight'){e.preventDefault();tourShow(tourI+1)}else if(e.key==='ArrowLeft'){e.preventDefault();tourShow(tourI-1)}}
+function tourClose(silent){
+  const l=$('#tourLayer');if(l)l.remove();window.removeEventListener('resize',tourPlace);document.removeEventListener('keydown',tourKey,true);
+  document.body.classList.remove('side-open');tourI=-1;
+}
+function tourShow(i){
+  const steps=UI[lang].tour;if(i<0)i=0;if(i>=steps.length){tourClose();return}
+  tourI=i;const mobile=window.innerWidth<=960;
+  if(TOUR_SEL[i]==='#sidebar'&&mobile)document.body.classList.add('side-open');else document.body.classList.remove('side-open');
+  const s=steps[i],card=$('#tourCard');if(!card)return;
+  card.innerHTML=`<h3><b>${i+1}</b>${esc(s.t)}</h3><p>${esc(s.d)}</p><div class="dots">${steps.map((_,j)=>`<i class="${j===i?'on':''}"></i>`).join('')}</div>
+   <div class="acts"><button class="btn btn-ghost btn-sm" data-tour="x">${esc(t('tour_skip'))}</button><div style="display:flex;gap:6px">${i>0?`<button class="btn btn-ghost btn-sm" data-tour="p">← ${esc(t('tour_prev'))}</button>`:''}<button class="btn btn-primary btn-sm" data-tour="n">${i===steps.length-1?'✔ '+esc(t('tour_done')):esc(t('tour_next'))+' →'}</button></div></div>`;
+  tourPlace();
+}
+function tourPlace(){
+  const sp=$('#tourSpot'),card=$('#tourCard');if(!sp||!card)return;
+  const sel=TOUR_SEL[tourI];let el=sel?$(sel):null,r=el?el.getBoundingClientRect():null;
+  if(r&&(r.width<2||r.height<2||r.right<0||r.left>innerWidth))r=null;
+  const vw=innerWidth,vh=innerHeight,cw=Math.min(340,vw-24),ch=card.offsetHeight||200;
+  if(!r){sp.style.cssText='left:50%;top:50%;width:0;height:0';card.style.left=Math.max(12,(vw-cw)/2)+'px';card.style.top=Math.max(12,(vh-ch)/2)+'px';return}
+  const top=Math.max(r.top,6),bottom=Math.min(r.bottom,vh-6),left=Math.max(r.left,6),right=Math.min(r.right,vw-6);
+  sp.style.left=(left-4)+'px';sp.style.top=(top-4)+'px';sp.style.width=(right-left+8)+'px';sp.style.height=(bottom-top+8)+'px';
+  let x,y;
+  if(vw-right>cw+24){x=right+14;y=Math.min(Math.max(top,12),vh-ch-12)}
+  else if(vh-bottom>ch+20){x=Math.min(Math.max(left,12),vw-cw-12);y=bottom+14}
+  else if(top>ch+20){x=Math.min(Math.max(left,12),vw-cw-12);y=top-ch-14}
+  else{x=Math.max(12,(vw-cw)/2);y=vh-ch-90}
+  card.style.left=x+'px';card.style.top=Math.max(12,y)+'px';
+}
+
+/* =====================================================================
+   BÚSQUEDA
+   ===================================================================== */
+const norm=s=>String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function doSearch(q){
+  const box=$('#searchRes');q=norm(q.trim());
+  if(!q){box.classList.remove('show');box.innerHTML='';return}
+  const res=STEPS.filter(s=>norm(stepTitle(s)+' '+s.id).includes(q)).slice(0,14);
+  box.innerHTML=res.length?res.map(s=>`<button data-go="${s.id}">${s.icon||''} ${esc(stepTitle(s))}</button>`).join(''):`<div class="empty">${esc(t('no_results'))}</div>`;
+  box.classList.add('show');
+}
+
+/* =====================================================================
+   IDIOMA / TEMA / TEXTOS ESTÁTICOS
+   ===================================================================== */
+function applyStatic(){
+  $$('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});
+  $$('[data-i18n-ph]').forEach(el=>{el.placeholder=t(el.dataset.i18nPh)});
+  $('#btnLang').textContent=lang==='es'?'🌐 EN':'🌐 ES';
+  $('#btnTheme').textContent=document.documentElement.dataset.theme==='dark'?'☀️':'🌙';
+  $('#progLbl').textContent=t('progress');
+  document.documentElement.lang=lang;
+  const sv=$('#saveInd');if(sv&&!sv.textContent)sv.textContent='💾 '+t('saved');
+}
+function setLang(l){lang=l;lsSet('cobit_lang',l);applyStatic();render();if($('#tourLayer'))tourShow(tourI)}
+let theme=lsGet('cobit_theme')||((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');
+function setTheme(x){theme=x;lsSet('cobit_theme',x);document.documentElement.dataset.theme=x;applyStatic();if(current==='resumen')render()}
+function fitHeader(){const h=$('#top');if(h)document.documentElement.style.setProperty('--hh',h.offsetHeight+'px')}
+
+/* =====================================================================
+   EVENTOS GLOBALES
+   ===================================================================== */
+function handleDo(b){
+  const a=b.dataset.do,sc=b.dataset.scope,fl=b.dataset.filled==='1';
+  switch(a){
+   case 'xlsx':exportXlsx(sc,fl);break;
+   case 'print':doPrint(sc,fl);break;
+   case 'prev':goRel(-1);break;
+   case 'next':if(saveT)saveNow();goRel(1);break;
+   case 'save':saveNow();toast('💾 '+t('saved_toast'),'success',1800);break;
+   case 'validate':validateForm();break;
+   case 'lang':setLang(lang==='es'?'en':'es');break;
+   case 'theme':setTheme(theme==='dark'?'light':'dark');break;
+   case 'tour':tourStart();break;
+   case 'side':document.body.classList.toggle('side-open');break;
+   case 'sec':UIS.open[b.dataset.sec]=UIS.open[b.dataset.sec]===false;renderSidebar();updateChrome();break;
+   case 'bk_export':exportBackup();break;
+   case 'bk_import':$('#fileIn').click();break;
+   case 'clear':confirmBox(t('conf_clear'),()=>{STATE={};lsDel(LS_KEY);lsDel('cobit2019_audit');lsDel('cobit_step');render();toast(t('cleared'),'success')});break;
+   case 'addrow':{const k=b.dataset.f+'.'+b.dataset.t+'.__extra';STATE[k]=String((parseInt(STATE[k])||0)+1);scheduleSave();const y=window.scrollY;render();window.scrollTo({top:y});break}
+  }
+}
+document.addEventListener('click',e=>{
+  const tr=e.target.closest('[data-tour]');if(tr){const a=tr.dataset.tour;if(a==='x')tourClose();else if(a==='n')tourShow(tourI+1);else tourShow(tourI-1);return}
+  const d=e.target.closest('[data-do]');
+  const g=e.target.closest('[data-go]');
+  if(d){e.preventDefault();handleDo(d)}
+  else if(g){e.preventDefault();go(g.dataset.go);$('#searchRes').classList.remove('show')}
+  $$('details.menu[open]').forEach(m=>{if(!m.contains(e.target)||e.target.closest('[data-do]')||e.target.closest('[data-go]'))m.open=false});
+  if(!e.target.closest('#searchBox'))$('#searchRes').classList.remove('show');
+  if(document.body.classList.contains('side-open')&&!e.target.closest('#sidebar')&&!e.target.closest('#btnSide')&&!e.target.closest('#tourLayer'))document.body.classList.remove('side-open');
+});
+document.addEventListener('keydown',e=>{
+  if(e.altKey&&e.key==='ArrowRight'){e.preventDefault();goRel(1)}
+  else if(e.altKey&&e.key==='ArrowLeft'){e.preventDefault();goRel(-1)}
+  else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveNow();toast('💾 '+t('saved_toast'),'success',1800)}
+});
+window.addEventListener('resize',fitHeader);
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.documentElement.dataset.theme=theme;
+  loadState();
+  const hash=(location.hash||'').replace('#',''),saved=lsGet('cobit_step');
+  current=STEP_MAP[hash]?hash:STEP_MAP[saved]?saved:'portada';
+  const page=$('#page');page.addEventListener('input',onEdit);page.addEventListener('change',onEdit);
+  page.addEventListener('focusout',e=>{const el=e.target,id=el&&el.dataset&&el.dataset.id;if(!id)return;const f=STEP_MAP[current];if(!f||f.kind!=='form')return;
+    const p=id.split('.');if(p.length===2){const fl=(f.fields||[]).find(x=>x.k===p[1]);if(fl&&fl.req)el.classList.toggle('invalid',String(el.value).trim()==='')}});
+  $('#q').addEventListener('input',e=>doSearch(e.target.value));
+  $('#q').addEventListener('keydown',e=>{if(e.key==='Enter'){const b=$('#searchRes button');if(b){go(b.dataset.go);$('#searchRes').classList.remove('show');e.target.blur()}}else if(e.key==='Escape'){e.target.value='';doSearch('')}});
+  $('#fileIn').addEventListener('change',e=>{const f=e.target.files[0];if(f)importBackup(f);e.target.value=''});
+  applyStatic();fitHeader();render();
+  if(lsGet(LS_KEY)||Object.keys(STATE).length)setInd('saved');
+});
+</script>
+</body>
+</html>
